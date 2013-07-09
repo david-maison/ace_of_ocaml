@@ -5,7 +5,8 @@
       function test(o1, o2) { 
         console.debug( o1 );
         console.debug( o2 );
-        console.debug( o1.compare(o2) == 0 );
+        <!-- ??? -->
+        <!-- console.debug( o1.compare(o2) == 0 ); -->
       }
 
     </script>
@@ -22,11 +23,14 @@
      	    charset="utf-8"></script>
     <script>
       var editor = ace.edit("js_editor2");
-      <!-- BEGIN TEST HERE -->
+      editor.setValue("let x = 10");
       var Range = ace.require("ace/range").Range;
-      var r = new Range(0,1,2,3);
-      var jsobj = editor.addSelectionMarker(r);
-;
+      var Search = ace.require("ace/search").Search;
+      <!-- BEGIN TEST HERE -->
+      var jsobj = editor.find(" ", null, true);
+      editor.findNext(null, true);
+      <!-- editor.findNext(null, true); -->
+      editor.findPrevious(null, true);
       <!-- END TEST HERE -->
       test(oobj, jsobj);
     </script>
