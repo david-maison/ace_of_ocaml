@@ -1,0 +1,6 @@
+*.annot
+*.cm[iaot]
+*.cmti
+*~
+main.js
+main.byte

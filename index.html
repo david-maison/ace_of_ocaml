@@ -1,0 +1,50 @@
+<html>
+  <body>
+    <script>
+
+      function test(o1, o2) { 
+        console.debug( o1 );
+        console.debug( o2 );
+        console.debug( o1.compare(o2) == 0 );
+      }
+
+    </script>
+    <script src="./ace-src/ace.js" type="text/javascript"
+	    charset="utf-8"></script>
+    <div id="js_editor" style="width: 400px; height: 400px; float:
+			       left;"></div>
+    <div id="js_editor2" style="width: 400px; height: 400px; float:
+			       left;"></div>
+    <script>
+      var editor = ace.edit("js_editor");
+    </script>
+    <script src="./main.js" type="text/javascript"
+     	    charset="utf-8"></script>
+    <script>
+      var editor = ace.edit("js_editor2");
+      <!-- BEGIN TEST HERE -->
+      var Range = ace.require("ace/range").Range;
+      var r = new Range(0,1,2,3);
+      var jsobj = editor.addSelectionMarker(r);
+;
+      <!-- END TEST HERE -->
+      test(oobj, jsobj);
+    </script>
+  <!--     <\!-- console.debug(Range); -\-> -->
+  <!--   </script> -->
+  <!-- </head> -->
+  <!-- <body> -->
+  <!--   <div id="js_editor" style="width: 400px; height: 400px; float: left;"></div> -->
+  <!-- </body> -->
+
+  <!-- <script> -->
+  <!--   var el = document.getElementById("js_editor"); -->
+  <!--   var editor = ace.edit(el); -->
+  <!--   editor.setValue("let a = print_endline \"coucou!\""); -->
+  <!--   var Range = ace.require("./range").Range; -->
+  <!--   var r = new Range(0,0,0,2); -->
+  <!--   console.debug(r); -->
+  <!--   console.debug(editor.addSelectionMarker(r)); -->
+  <!-- </script> -->
+  </body>
+</html>
