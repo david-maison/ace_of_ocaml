@@ -27,10 +27,12 @@
       var Range = ace.require("ace/range").Range;
       var Search = ace.require("ace/search").Search;
       <!-- BEGIN TEST HERE -->
-      var jsobj = editor.find(" ", null, true);
-      editor.findNext(null, true);
-      <!-- editor.findNext(null, true); -->
-      editor.findPrevious(null, true);
+      var o = new Object();
+      o.row = 0;
+      o.column = 5;
+      var jsobj = o
+      editor.moveCursorToPosition(o);
+
       <!-- END TEST HERE -->
       test(oobj, jsobj);
     </script>

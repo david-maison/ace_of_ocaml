@@ -15,11 +15,8 @@ let _ =
   require "Range";
 
   (* BEGIN TEST HERE *)
-  let obj = editor##find(some (string " "), searchOptionsTEST, Js._true) in
-  editor##findNext(searchOptionsTEST, Js._true);
-  (* editor##findNext(searchOptionsTEST, Js._true); *)
-  editor##findPrevious(searchOptionsTEST, Js._true);
-
+  let obj = pos_w 0 5 in
+  editor##moveCursorToPosition(obj);
   
   (* END TEST HERE *)
   setVarTest obj
