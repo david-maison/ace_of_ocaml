@@ -11,7 +11,7 @@ let setVarTest o =
 
 let _ =
   let editor : editor Js.t = Js.Unsafe.get Dom_html.window "editor" in
-  editor##setValue(Js.string "let x = 10");
+  editor##setValue(Js.string "let x = 10", Obj.magic 5);
   require "Range";
 
   (* BEGIN TEST HERE *)

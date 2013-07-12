@@ -1,12 +1,34 @@
 
 open Js
 
-type searchOptions
-type tokenarray
-type selectOBJ
-
 (* TO BE DELETED *)
-val searchOptionsTEST : searchOptions
+type searchOptions
+type selectOBJ
+type markerOBJ
+type markerResOBJ
+type typeMarkerOBJ
+type annotOBJ
+type stateUnknownOBJ
+type tokenOBJ
+type tokenarrayOBJ
+type undoManagerOBJ
+type limitOBJ
+type insertResOBJ
+type toPositionOBJ
+type objectEOBJ
+type deltaOBJ
+type removeResOBJ
+type replaceResOBJ
+type posResOBJ
+type scrollLeftOBJ
+type scrollTopIBJ
+type undoManager
+type deltasOBJ
+type replaceOptions
+type callbackOBJ
+type cursorPos
+type style
+(* END TO BE DELETED *)
 
 class type pos_w = object
   method row : int writeonly_prop
@@ -42,14 +64,101 @@ end
   method setValue : js_string t -> unit meth
 end
 
-(* TO COMPLETE *) class type editSession = object
+(* TO COMPLETE ( on() + constr) *) class type editSession = object
+  method addDynamicMarker : markerOBJ -> bool t -> markerResOBJ (* A TEST *)
+  method addGutterDecoration : int -> js_string t -> unit meth
+  method addMarker : range t -> js_string t -> typeMarkerOBJ -> bool t -> int meth (* A TEST *)
+  method clearAnnotations : unit meth
+  method clearBreakpoint : int -> unit meth
+  method clearBreakpoints : unit meth
+  method documentToScreenColumn : int -> int -> int meth (* A TEST *)
+  method documentToScreenPosition : int -> int -> pos_r t meth (* A TEST *)
+  method documentToScreenRow : int -> int -> int meth  (* A TEST *)
+  method duplicateLines : int -> int -> int meth       (* A TEST *)
+  method getAnnotations : annotOBJ meth		       (* A TEST *)
+  method getAWordRange : int -> int -> range t meth
+  method getBreakpoints : int js_array t meth (* A TEST *)
   method getDocument : document t meth
+  method getDocumentLastRowColumn : int -> int -> int meth (* A TEST *)
+  method getDocumentLastRowColumnPosition : int -> int -> pos_r t meth (* A TEST *)
+  method getLength : int meth
+  method getLine : int -> js_string t meth
+  method getLines : int -> int -> string_array t meth
+  method getMarkers : bool t -> markerOBJ js_array meth (* A TEST *)
+  method getMode : js_string t meth			(* A TEST *)
+  method getNewLineMode : js_string t meth
+  method getOverwrite : bool t meth
+  method getRowLength : int -> int meth
+  method getRowSplitData : int -> js_string t meth (* A TEST (object row et res ? *)
+  method getScreenLastRowColumn : int -> int meth  (* A TEST : int or pos? *)
+  method getScreenLength : int meth
+  method getScreenTabSize : int -> int meth
+  method getScreenWidth : int meth
+  method getScrollLeft : int meth
+  method getScrollTop : int meth
+  method getSelection : js_string t meth
+  method getState : int -> stateUnknownOBJ meth (* A TEST *)
   method getTabSize : int meth
-  (* method getTokens : int -> tokenarray *)
+  method getTabString : js_string t meth (* A TEST *)
+  method getTextRange : range t -> js_string t meth
+  method getTokenAt : int -> int -> tokenOBJ meth (* A TEST *)
+  method getTokens : int -> tokenarrayOBJ meth	  (* A TEST *)
+  method getUndoManager : undoManagerOBJ meth	  (* A TEST *)
+  method getUseSoftTabs : bool t meth
+  method getUseWorker : bool t meth
+  method getUseWrapMode : bool t meth
+  method getValue : js_string t meth
+  method getWordRange : int -> int -> range t meth
+  method getWrapLimit : int meth
+  method getWrapLimitRange : limitOBJ meth (* A TEST { min: wrapLimitRange_min, max: wrapLimitRange_max } *)
+  method highlight : unit meth (* A TEST (Undocumented) *)
+  method highlightLines : unit meth (* A TEST (Undocumented) *)
+  method indentRows : int -> int -> js_string t -> unit meth
+  method insert : pos_w t -> js_string t -> insertResOBJ meth (* A TEST *)
+  method isTabStop : pos_w t -> bool t meth		      (* A TEST *)
+  method moveLinesDown : int -> int -> int meth		      (* A TEST *)
+  method moveLinesUp : int -> int -> int meth		      (* A TEST *)
+  method moveText : range t -> toPositionOBJ -> range t meth  (* A TEST *)
+  method onChange : unit meth (* A TEST (Undocumented) *)
+  method onChangeFold : unit meth (* A TEST (Undocumented) *)
+  method onReloadTokenizer : objectEOBJ -> unit meth (* A TEST *)
+  method outdentRows : range t -> unit meth
+  method redo : unit meth (* A TEST (Undocumented) *)
+  method redoChanges : deltaOBJ js_array t -> bool t -> range t meth (* A TEST *)
+  method remove : range t -> removeResOBJ meth (* A TEST *)
+  method removeGutterDecoration : int -> js_string t -> unit meth
+  method removeMarker : int -> unit 	(* A TEST : markerId *)
+  method replace : range t -> js_string t -> replaceResOBJ meth (* A TEST *)
+  method reset : unit meth (* A TEST (Undocumented) *)
+  method resetCaches : unit meth (* A TEST (Undocumented) *)
+  method screenToDocumentColumn : unit meth (* A TEST (Undocumented) *)
+  method screenToDocumentPosition : int -> int -> posResOBJ meth (* A TEST *)
+  method screenToDocumentRow : unit meth (* A TEST (Undocumented) *)
+  method setAnnotations : annotOBJ js_array t -> unit meth (* A TEST *)
+  method setBreakpoint : int -> js_string t -> unit meth
+  method setBreakpoints : int js_array t -> unit meth
+  method setDocument : document t -> unit meth
+  method setMode : unit meth (* A TEST (Undocumented) *)
+  method setNewLineMode : js_string t -> unit meth
+  method setOverwrite : bool t -> unit meth
+  method setScrollLeft : scrollLeftOBJ -> unit meth (* A TEST *)
+  method setScrollTop : scrollTopIBJ -> unit meth   (* A TEST *)
+  method setTabSize : int -> unit meth
+  method setUndoManager : undoManager t -> unit meth
+  method setUndoSelect : bool t -> unit meth
+  method setUseSoftTabs : bool t -> unit meth
+  method setUseWorker : bool t -> unit meth
+  method setUseWrapMode : bool t -> unit meth
+  method setValue : js_string t -> unit meth
+  method setWrapLimitRange : int -> int -> unit meth
+  method toggleOverwrite : unit meth
+  method toString : js_string t meth
+  method undo : unit meth (* A TEST (Undocumented) *)
+  method undoChanges : deltasOBJ -> bool t -> range t meth (* A TEST *)
 end
 
 
-class type editor = object
+(* TO COMPLETE (on()) + constr *)class type editor = object
   method addSelectionMarker : #range t -> orientedRange t meth
   method alignCursors : unit meth
   method blockOutdent : unit meth
@@ -161,7 +270,7 @@ class type editor = object
   method revealRange : unit meth (* A TEST (Undocumented) *)
   method scrollPageDown : unit meth
   method scrollPageUp : unit meth
-  method scrollToLine : int -> bool t -> bool t -> callback -> unit meth (* A TEST (callback !) *)
+  method scrollToLine : int -> bool t -> bool t -> callbackOBJ -> unit meth (* A TEST (callback !) *)
   method scrollToRow : int -> unit meth (* A TEST (doc : Object row?) *)
   method selectAll : unit meth
   method selectMore : int -> bool t -> unit meth (* A TEST : doc : Number dir *)
