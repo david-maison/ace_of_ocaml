@@ -2,16 +2,23 @@
 open Js
 
 (* TO BE DELETED *)
+type offsetOBJ
+type coordOBJ
+type undoOptionsOBJ
 type searchOptions
+type searchOptionsOBJ
 type selectOBJ
 type markerOBJ
 type markerResOBJ
+type cursorOBJ
+type anchorOBJ
+type selectAnchorOBJ
+type selectLeadOBJ
 type typeMarkerOBJ
 type annotOBJ
 type stateUnknownOBJ
 type tokenOBJ
 type tokenarrayOBJ
-type undoManagerOBJ
 type limitOBJ
 type insertResOBJ
 type toPositionOBJ
@@ -22,7 +29,6 @@ type replaceResOBJ
 type posResOBJ
 type scrollLeftOBJ
 type scrollTopIBJ
-type undoManager
 type deltasOBJ
 type replaceOptions
 type callbackOBJ
@@ -45,29 +51,89 @@ class type pos_r = object
 end
 
 
-(* TO COMPLETE *) class type range = object
+
+(* TO COMPLETE (on() + constr)*)class type scrollbar = object
+  method getWidth : int meth
+  method onScroll : unit meth           (* A TEST (Undocumented)*)
+  method setHeight : int -> unit meth
+  method setInnerHeight : int -> unit meth
+  method setScrollTop : int -> unit meth
+end
+
+
+(* TO TEST *) class type range = object
   method _end : pos_r t readonly_prop
   method start : pos_r t readonly_prop
+
+  method clipRows : int -> int -> range t meth
+  method clone : range t meth
+  method collapseRows : range t meth
+  method compare : int -> int -> int meth
+  method compareEnd : int -> int -> int meth
+  method compareInside : int -> int -> int meth
+  method comparePoint : range t -> int meth (* A TEST range = point ? *)
+  method compareRange : range t -> int meth
+  method compareStart : int -> int -> int meth
+  method contains : int -> int -> bool t meth
+  method containsRange : range t -> bool t meth
+  method extend : int -> int -> range t meth (* A TEST return new range or not? *)
+  method fromPoints : range t -> range t -> range t meth (* A TEST range = point ? *)
+  method inside : int -> int -> bool t meth
+  method insideEnd : int -> int -> bool t meth
+  method insideStart : int -> int -> bool t meth
+  method intersects : range t -> bool t meth
+  method isEmpty : unit meth            (* A TEST (Undocumented) *)
+  method isEnd : int -> int -> bool t meth
+  method isEqual : range t -> bool t meth
+  method isMultiLine : bool t meth
+  method isStart : int -> int -> bool t meth
+  method setEnd : int -> int -> unit meth
+  method setStart : int -> int -> unit meth
+  method toScreenRange : editSession t -> range t meth (* A TEST effet = ? *)
+  method toString : js_string t meth
 end
 
-let range = Unsafe.variable "ace.require(\"./range\").Range"
 
-(* TO COMPLETE *) class type orientedRange = object
-  inherit range
-  method cursor : pos_r t readonly_prop
-  method marker : int readonly_prop
+
+(* TO COMPLETE constr *)and undoManager = object
+  method execute : undoOptionsOBJ -> unit meth (* A TEST (voir doc) *)
+  method hasRedo : bool t meth
+  method hasUndo : bool t meth
+  method redo : bool t -> unit meth     (* A TEST = res = unit ? *)
+  method reset : unit meth
+  method undo : bool t -> range t meth  (* A TEST = res = range ? *)
 end
 
-(* TO COMPLETE *) class type document = object
+
+(* TO COMPLETE (on() + constr) *) and document = object
+  method applyDeltas : deltasOBJ -> unit meth
+  method createAnchor : int -> int -> unit meth (* A TEST Ret = unit or anchor *)
+  method getAllLines : string_array t meth        (* A TEST comportement *)
+  method getLength : int meth
   method getLine : int -> js_string t meth
-  method getLines : int -> int -> string_array t meth
+  method getLines : int -> int -> string_array t meth (* A TEST comportement *)
+  method getNewLineCharacter : js_string t meth
+  method getNewLineMode : js_string t meth (* A TEST Res : enum or string ? *)
   method getTextRange : range t -> js_string t meth
   method getValue : js_string t meth
-  method replace : range t -> js_string t -> unit meth
+  method indexToPosition : int -> int -> pos_r t meth (* A VERIF *)
+  method insert : pos_w t -> js_string t -> insertResOBJ meth (* A TEST *)
+  method insertInLine : pos_w t -> js_string t -> insertResOBJ meth (* A TEST *)
+  method insertLines : int -> string_array t -> insertResOBJ meth   (* A TEST array+res *)
+  method insertNewLine : pos_w t -> insertResOBJ meth               (* A TEST *)
+  method isNewLine : js_string t -> bool t meth
+  method positionToIndex : pos_w t -> int -> int meth (* A TEST *)
+  method remove : range t -> removeResOBJ meth        (* A TEST *)
+  method removeInLine : int -> int -> int -> removeResOBJ meth (* A TEST *)
+  method removeLines : int -> int -> js_string t meth          (* A TEST *)
+  method removeNewLine : int -> removeResOBJ                   (* A TEST *)
+  method replace : range t -> js_string t -> replaceResOBJ meth (* A TEST *)
+  method revertDeltas : deltasOBJ -> unit meth                  (* A TEST *)
+  method setNewLineMode : js_string t -> unit meth
   method setValue : js_string t -> unit meth
 end
 
-(* TO COMPLETE ( on() + constr) *) class type editSession = object
+(* TO COMPLETE ( on() + constr) *) and editSession = object
   method addDynamicMarker : markerOBJ -> bool t -> markerResOBJ (* A TEST *)
   method addGutterDecoration : int -> js_string t -> unit meth
   method addMarker : range t -> js_string t -> typeMarkerOBJ -> bool t -> int meth (* A TEST *)
@@ -106,7 +172,7 @@ end
   method getTextRange : range t -> js_string t meth
   method getTokenAt : int -> int -> tokenOBJ meth (* A TEST *)
   method getTokens : int -> tokenarrayOBJ meth	  (* A TEST *)
-  method getUndoManager : undoManagerOBJ meth	  (* A TEST *)
+  method getUndoManager : undoManager meth
   method getUseSoftTabs : bool t meth
   method getUseWorker : bool t meth
   method getUseWrapMode : bool t meth
@@ -159,6 +225,171 @@ end
   method undo : unit meth (* A TEST (Undocumented) *)
   method undoChanges : deltasOBJ -> bool t -> range t meth (* A TEST *)
 end
+
+
+(* TO COMPLETE (constr + on()  *)class type anchor = object
+  method detach : unit meth
+  method getDocument : document t meth
+  method getPosition : pos_r t meth     (* A TEST *)
+  method onChange : unit meth           (* A TEST (Undocumented) *)
+  method setPosition : int -> int -> bool t -> unit meth
+end
+
+
+(* TO COMPLETE constr *)class type search = object
+  method find : editSession t -> range t meth
+  method findAll : editSession t -> range t meth (* A TEST Res = range or array *)
+  method getOptions : searchOptionsOBJ meth      (* A TEST *)
+  method replace : js_string t -> js_string t -> js_string t (* A TEST Res = ? *)
+  method set : searchOptionsOBJ meth                         (* A TEST *)
+  method setOptions : unit meth                              (* A TEST (Undocumented) *)
+end
+
+
+class type orientedRange = object
+  inherit range
+  method cursor : pos_r t readonly_prop
+  method marker : int readonly_prop
+end
+
+
+(* TO COMPLETE (on() and constr) *)class type selection = object
+  method addRange : range t -> bool t -> unit meth (* A TEST *)
+  method clearSelection : unit meth
+  method detach : unit meth             (* A TEST (Undocumented) *)
+  method fromOrientedRange : unit meth  (* A TEST (Undocumented) *)
+  method getAllRanges : range t js_array t meth (* A TEST Res *)
+  method getCursor : int meth           (* A TEST Res *)
+  method getLineRange : unit meth       (* A TEST (Undocumented) *)
+  method getRange : range t meth
+  method getSelectionAnchor : selectAnchorOBJ meth (* A TEST *)
+  method getSelectionLead : selectLeadOBJ meth     (* A TEST *)
+  method getWordRange : int -> int -> unit meth    (* A TEST row and column = object ?? res = unit ?? *)
+  method isBackwards : bool t meth
+  method isEmpty : bool t meth
+  method isMultiLine : bool t meth
+  method mergeOverlappingRanges : unit meth
+  method moveCursorBy : int -> int -> unit meth
+  method moveCursorDown : unit meth
+  method moveCursorFileEnd : unit meth
+  method moveCursorFileStart : unit meth
+  method moveCursorLeft : unit meth
+  method moveCursorLineEnd : unit meth
+  method moveCursorLineStart : unit meth
+  method moveCursorLongWordLeft : unit meth
+  method moveCursorLongWordRight : unit meth
+  method moveCursorRight : unit meth
+  method moveCursorShortWordLeft : unit meth (* A TEST (Undocumented) *)
+  method moveCursorShortWordRight : unit meth (* A TEST (Undocumented) *)
+  method moveCursorTo : int -> int -> bool t -> unit meth
+  method moveCursorToPosition : pos_w t -> unit meth (* A TEST pos_w *)
+  method moveCursorToScreen : int -> int -> bool t -> unit meth
+  method moveCursorUp : unit meth
+  method moveCursorWordLeft : unit meth (* A TEST (Undocumented) *)
+  method moveCursorWordRight : unit meth (* A TEST (Undocumented) *)
+  method rectangularRangeBlock : cursorOBJ -> anchorOBJ -> bool t -> range t meth (* A CHANGER *)
+  method selectAll : unit meth
+  method selectAWord : unit meth
+  method selectDown : unit meth
+  method selectFileEnd : unit meth
+  method selectFileStart : unit meth
+  method selectLeft : unit meth
+  method selectLine : unit meth
+  method selectLineEnd : unit meth
+  method selectLineStart : unit meth
+  method selectRight : unit meth
+  method selectTo : int -> int -> unit meth
+  method selectToPosition : pos_w t -> unit meth (* A TEST pos_w *)
+  method selectUp : unit meth
+  method selectWord : unit meth
+  method selectWordLeft : unit meth
+  method selectWordRight : unit meth
+  method setSelectionAnchor : int -> int -> unit
+  method setSelectionRange : range t -> bool t -> unit
+  method shiftSelection : int -> unit meth
+  method splitIntoLines : unit meth
+  method substractPoint : range t -> unit meth (* A TEST range or point or pos ? *)
+  method toggleBlockSelection : unit meth      (* A TEST (Undocumented) *)
+  method toOrientedRange : unit meth (* A TEST (Undocumented) *)
+  method toSingleRange : unit meth (* A TEST (Undocumented) *)
+end
+
+
+(* TO COMPLETE constr *)class type virtualRenderer = object
+  method _loadTheme : unit meth  (* A TEST (Undocumented) *)
+  method addGutterDecoration : int -> js_string t -> unit meth (* DEPRECATED *)
+  method adjustWrapLimit : unit meth
+  method alignCursor : unit meth  (* A TEST (Undocumented) *)
+  method animateScrolling : unit meth  (* A TEST (Undocumented) *)
+  method destroy : unit meth
+  method getAnimatedScroll : bool t meth
+  method getContainerElement : Dom.element t meth (* A TEST Dom.element *)
+  method getDisplayIndentGuides : unit meth (* A TEST (Undocumented) *)
+  method getFadeFoldWigdets : unit meth (* A TEST (Undocumented) *)
+  method getFirstFullyVisibleRow : int meth
+  method getFirstVisibleRow : int meth 
+  method getHighlightGutterLine : unit meth (* A TEST (Undocumented) *)
+  method getHScrollBarAlwaysVisible : bool t meth
+  method getLastFullyVisibleRow : int meth
+  method getLastVisibleRow : int meth
+  method getMouseEventTarget : Dom.element t meth (* A TEST Dom.element *)
+  method getPrintMarginColumn : bool t meth
+  method getScrollBottomRow : int meth
+  method getScrollLeft : int meth
+  method getScrollTop : int meth
+  method getScrollTopRow : int meth
+  method getShowGutter : bool t meth
+  method getShowInvisibles : bool t meth
+  method getShowPrintMargin : bool t meth
+  method getTextAreaContainer : Dom.element t meth (* A TEST Dom.element *)
+  method getTheme : js_string t meth
+  method hideComposition : unit meth
+  method hideCursor : unit meth
+  method isScrollableBy : int -> int -> bool t meth
+  method onChangeTabSize : unit meth    (* A TEST (Undocumented) *)
+  method onGutterResize : unit meth    (* A TEST (Undocumented) *)
+  method onResize : bool t -> int -> int -> int -> unit meth
+  method pixelToScreenCoordinates : unit meth    (* A TEST (Undocumented) *)
+  method removeGutterDecoration : int -> js_string t -> unit meth (* DEPRECATED *)
+  method screenToTextCoordinates : unit meth (* A TEST (Undocumented) *)
+  method scrollBy : int -> int -> unit meth
+  method scrollCursorIntoView : cursorOBJ -> offsetOBJ -> unit meth (* A TEST *)
+  method scrollSelectionIntoView : unit meth (* A TEST (Undocumented) *)
+  method scrollToLine: int -> bool t -> bool t -> callbackOBJ -> unit meth (* A TEST callback *)
+  method scrollToRow : int -> unit meth
+  method scrollToX : int -> int meth    (* A TEST Res = int ? *)
+  method scrollToY : int -> int meth    (* A TEST Res = int ? *)
+  method setAnimatedScroll : bool t -> unit meth
+  method setAnnontations : annotOBJ js_array t -> unit meth (* A TEST *)
+  method setCompositionText : js_string t -> unit meth (* A TEST (Undocumented) *)
+  method setDisplayIndentGuides : unit meth (* A TEST (Undocumented) *)
+  method setFadeFoldWidgets : unit meth (* A TEST (Undocumented) *)
+  method setHighlightGutterLine : unit meth (* A TEST (Undocumented) *)
+  method setHScrollBarAlwaysVisible : bool t -> unit meth
+  method setPadding : int -> unit meth
+  method setPrintMarginColumn : bool t -> unit meth
+  method setSession : editSession t -> unit meth
+  method setShowGutter : bool t -> unit meth
+  method setShowInvisibles : bool t -> unit meth
+  method setShowPrintMargin : bool t -> unit meth
+  method setStyle : unit meth (* A TEST (Undocumented) *)
+  method setTheme : js_string t -> unit meth
+  method showCursor : unit meth
+  method textToScreenCoordinates : int -> int -> coordOBJ meth
+  method unsetStyle : js_string t -> unit meth
+  method updateBackMarkers : unit meth
+  method updateBreakpoints : int -> unit meth (* A TEST rows = obj ? array ? *)
+  method updateCharacterSize : unit meth      (* A TEST (Undocumented) *)
+  method updateCursor : unit meth
+  method updateFontSize : unit meth
+  method updateFrontMarkers : unit meth
+  method updateFull : bool t -> unit meth
+  method updateLines : int -> int -> unit meth
+  method updateText : unit meth
+  method visualizeBlur : unit meth
+  method visualizeFocus : unit meth
+end
+
 
 (* TO COMPLETE (on())  + constr*)class type editor = object
   method addSelectionMarker : #range t -> orientedRange t meth
@@ -315,6 +546,7 @@ end
   method updateSelectionMarkers : unit meth
 end
 
+let range = Unsafe.variable "ace.require(\"./range\").Range"
 
 
 let edit el = 
