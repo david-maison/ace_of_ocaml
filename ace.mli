@@ -2,6 +2,9 @@
 open Js
 
 (* TO BE DELETED *)
+type rulesOBJ
+type stateTokenOBJ
+type stateAndTokenOBJ
 type offsetOBJ
 type coordOBJ
 type undoOptionsOBJ
@@ -48,7 +51,21 @@ class type pos_r = object
   method column : int readonly_prop
 end
 
-(* TO COMPLETE (on() + constr)*)class type scrollbar = object
+(* TO COMPLETE (constr) *)class type tokenizer = object
+  method getLineTokens : int -> stateTokenOBJ -> stateAndTokenOBJ meth (* A TEST line = int or string ? state = ? res = ? *)
+end
+
+(* TO COMPLETE (constr) *)class type tokenIterator = object
+  method getCurrentToken : js_string t meth (* A TEST Res = string or token? *)
+  method getCurrentTokenColumn : int meth
+  method getCurrentTokenRow : int meth
+  method stepBackward : js_string t meth 	(* A TEST *)
+  method stepForward : js_string t meth		(* A TEST *)
+
+end
+
+
+(* TO COMPLETE (on() + constr)*)class type scrollBar = object
   method getWidth : int meth
   method onScroll : unit meth           (* A TEST (Undocumented)*)
   method setHeight : int -> unit meth
@@ -222,6 +239,15 @@ end
   method undoChanges : deltasOBJ -> bool t -> range t meth (* A TEST *)
 end
 
+
+(* TO COMPLETE (on() + constr)*)class type backgroundTokenizer = object
+  method fireUpdateEvent : int -> int -> unit meth
+  method getState : int -> stateTokenOBJ meth	(* A TEST Res *)
+  method getTokens : int -> tokenOBJ js_array t meth (* A TEST Res *)
+  method setDocument : document t -> unit meth
+  method setTokenizer : tokenizer t -> unit meth
+  method stop : unit meth
+end
 
 (* TO COMPLETE (constr + on()  *)class type anchor = object
   method detach : unit meth
@@ -542,7 +568,27 @@ end
   method updateSelectionMarkers : unit meth
 end
 
+
+
+(** CONSTRUCTORS **)
+(* No need to call requires ?? *)
+
+val anchor : (document t -> int -> int -> anchor t) constr
+(* A TEST *)val backgroundTokenizer : (tokenizer t -> editor t -> backgroundTokenizer t) constr
+(* TO COMPLETE *)val document : (js_string t -> document t) constr
+(* TO COMPLETE AND TEST (mode = ?)*)val editSession : (js_string t -> js_string t -> editSession t) constr
+(* A TEST *)val editor : (virtualRenderer t -> editSession t -> editor t) constr
 val range : (int -> int -> int -> int -> range t) constr
+(* A TEST (Dom.element) *)val scrollBar : (Dom.element t -> scrollBar t) constr
+(* A TEST *)val search : search t constr
+(* A TEST *)val selection : (editSession t -> selection t) constr
+(* A TEST *)val tokenIterator : (editSession t -> int -> int -> tokenIterator t) constr
+(* A TEST rules = ? *)val tokenizer : (rulesOBJ -> js_string t -> tokenizer t) constr
+(* A TEST *)val undoManager : undoManager t constr
+(* A TEST *)val virtualRenderer : (Dom.element t -> js_string t -> virtualRenderer t) constr
+
+
+(** ACE MAIN'S FUNCTIONS **)
 
 (* TO COMPLETE *) val edit : Dom.element t -> editor t (* A TEST Dom.element ? *)
 (* TO COMPLETE *) val createEditSession : string -> string -> editSession t

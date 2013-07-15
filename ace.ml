@@ -2,6 +2,9 @@
 open Js
 
 (* TO BE DELETED *)
+type rulesOBJ
+type stateTokenOBJ
+type stateAndTokenOBJ
 type offsetOBJ
 type coordOBJ
 type undoOptionsOBJ
@@ -51,8 +54,20 @@ class type pos_r = object
 end
 
 
+(* TO COMPLETE (constr) *)class type tokenizer = object
+  method getLineTokens : int -> stateTokenOBJ -> stateAndTokenOBJ meth (* A TEST line = int or string ? state = ? res = ? *)
+end
 
-(* TO COMPLETE (on() + constr)*)class type scrollbar = object
+(* TO COMPLETE (constr) *)class type tokenIterator = object
+  method getCurrentToken : js_string t meth (* A TEST Res = string or token? *)
+  method getCurrentTokenColumn : int meth
+  method getCurrentTokenRow : int meth
+  method stepBackward : js_string t meth 	(* A TEST *)
+  method stepForward : js_string t meth		(* A TEST *)
+
+end
+
+(* TO COMPLETE (on() + constr)*)class type scrollBar = object
   method getWidth : int meth
   method onScroll : unit meth           (* A TEST (Undocumented)*)
   method setHeight : int -> unit meth
@@ -226,6 +241,15 @@ end
   method undoChanges : deltasOBJ -> bool t -> range t meth (* A TEST *)
 end
 
+
+(* TO COMPLETE (on() + constr)*)class type backgroundTokenizer = object
+  method fireUpdateEvent : int -> int -> unit meth
+  method getState : int -> stateTokenOBJ meth	(* A TEST Res *)
+  method getTokens : int -> tokenOBJ js_array t meth (* A TEST Res *)
+  method setDocument : document t -> unit meth
+  method setTokenizer : tokenizer t -> unit meth
+  method stop : unit meth
+end
 
 (* TO COMPLETE (constr + on()  *)class type anchor = object
   method detach : unit meth
@@ -546,7 +570,29 @@ end
   method updateSelectionMarkers : unit meth
 end
 
+
+
+(** CONSTRUCTORS **)
+(* No need to call requires ?? *)
+
+let anchor = Unsafe.variable "ace.require(\"./anchor\").Anchor"
+(* A TEST *)let backgroundTokenizer = Unsafe.variable "ace.require(\"./backgroundTokenizer\").BackgroundTokenizer"
+(* TO COMPLETE *)let document = Unsafe.variable "ace.require(\"./document\").Document"
+(* TO COMPLETE AND TEST (mode = ?)*)let editSession= Unsafe.variable "ace.require(\"./editSession\").EditSession" 
+(* A TEST *)let editor = Unsafe.variable "ace.require(\"./editor\").Editor"
 let range = Unsafe.variable "ace.require(\"./range\").Range"
+(* A TEST (Dom.element) *)let scrollBar = Unsafe.variable "ace.require(\"./scrollBar\").ScrollBar"
+(* A TEST *)let search = Unsafe.variable "ace.require(\"./search\").Search"
+(* A TEST *)let selection = Unsafe.variable "ace.require(\"./selection\").Selection"
+(* A TEST *)let tokenIterator = Unsafe.variable "ace.require(\"./tokenIterator\").TokenIterator"
+(* A TEST rules = ? *)let tokenizer = Unsafe.variable "ace.require(\"./tokenizer\").Tokenizer"
+(* A TEST *)let undoManager = Unsafe.variable "ace.require(\"./undoManager\").UndoManager"
+(* A TEST *)let virtualRenderer = Unsafe.variable "ace.require(\"./virtualRenderer\").VirtualRenderer"
+
+
+(** ACE MAIN'S FUNCTIONS **)
+let range = Unsafe.variable "ace.require(\"./range\").Range"
+
 
 
 let edit el = 

@@ -26,12 +26,12 @@
       editor.setValue("let x = 10");
       var Range = ace.require("ace/range").Range;
       var Search = ace.require("ace/search").Search;
+      var Anchor = ace.require("./anchor").Anchor;
+      var Tokenizer = ace.require("./tokenizer").Tokenizer;
       <!-- BEGIN TEST HERE -->
-      var o = new Object();
-      o.row = 0;
-      o.column = 5;
-      var jsobj = o
-      editor.moveCursorToPosition(o);
+      var tok = new Tokenizer();
+      console.debug(tok); 
+      var jsobj = new Anchor(doc, 0, 5);
 
       <!-- END TEST HERE -->
       test(oobj, jsobj);

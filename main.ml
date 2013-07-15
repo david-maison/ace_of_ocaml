@@ -15,8 +15,8 @@ let _ =
   require "Range";
 
   (* BEGIN TEST HERE *)
-  let obj = pos_w 0 5 in
-  editor##moveCursorToPosition(obj);
+  let doc = editor##getSession()##getDocument() in
+  let obj = jsnew anchor(doc, 0, 5) in
   
   (* END TEST HERE *)
   setVarTest obj
