@@ -51,6 +51,15 @@ class type pos_r = object
   method column : int readonly_prop
 end
 
+(* TO COMPLETE *)type tokenizerToken = Str of js_string t | Arr of string_array t
+
+type tokenizerState
+val tokenizerState : string -> (tokenizerToken * js_string t * js_string t Opt.t ) list -> tokenizerState
+
+type tokenizerRules
+val tokenizerRules : tokenizerState list -> tokenizerRules t
+
+
 (* TO COMPLETE (constr) *)class type tokenizer = object
   method getLineTokens : int -> stateTokenOBJ -> stateAndTokenOBJ meth (* A TEST line = int or string ? state = ? res = ? *)
 end

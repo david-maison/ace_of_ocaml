@@ -54,6 +54,32 @@ class type pos_r = object
 end
 
 
+(* TO COMPLETE *)type tokenizerToken = Str of js_string t | Arr of string_array t
+
+(* AIE AIE AIE AIE AIE *)
+type test
+type tokenizerState = string * (test js_array t)
+let tokenizerState (nameState: string) (tokensInfos: (tokenizerToken * js_string t * js_string t Opt.t) list)  =
+  let state = jsnew array_empty() in
+  let _ = List.fold_left (fun i (token, regex, next_opt) ->
+    let obj = Unsafe.obj [| "token", Unsafe.inject token ;
+                            "regex", Unsafe.inject regex |] in
+    begin match Opt.to_option next_opt with
+      | None -> obj
+      | Some next -> Unsafe.set obj "next" next
+    end;
+    array_set state i obj;
+    i+1) 0 tokensInfos in
+  (nameState, state)
+    
+type tokenizerRules
+let tokenizerRules tokenizerStates =
+  let rules = Unsafe.obj [||] in
+  List.iter (fun (name, state) ->
+    Unsafe.set rules name state) tokenizerStates;
+  rules
+
+
 (* TO COMPLETE (constr) *)class type tokenizer = object
   method getLineTokens : int -> stateTokenOBJ -> stateAndTokenOBJ meth (* A TEST line = int or string ? state = ? res = ? *)
 end

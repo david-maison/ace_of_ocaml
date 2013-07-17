@@ -23,34 +23,19 @@
      	    charset="utf-8"></script>
     <script>
       var editor = ace.edit("js_editor2");
-      editor.setValue("let x = 10");
+      var es = ace.createEditSession("let x = 10", "ace/mode/ocaml");
+      editor.setSession(es);
       var Range = ace.require("ace/range").Range;
       var Search = ace.require("ace/search").Search;
       var Anchor = ace.require("./anchor").Anchor;
       var Tokenizer = ace.require("./tokenizer").Tokenizer;
       <!-- BEGIN TEST HERE -->
       var tok = new Tokenizer();
-      console.debug(tok); 
-      var jsobj = new Anchor(doc, 0, 5);
+      console.debug(es.bgTokenizer); 
+      var jsobj = 0;
 
       <!-- END TEST HERE -->
       test(oobj, jsobj);
     </script>
-  <!--     <\!-- console.debug(Range); -\-> -->
-  <!--   </script> -->
-  <!-- </head> -->
-  <!-- <body> -->
-  <!--   <div id="js_editor" style="width: 400px; height: 400px; float: left;"></div> -->
-  <!-- </body> -->
-
-  <!-- <script> -->
-  <!--   var el = document.getElementById("js_editor"); -->
-  <!--   var editor = ace.edit(el); -->
-  <!--   editor.setValue("let a = print_endline \"coucou!\""); -->
-  <!--   var Range = ace.require("./range").Range; -->
-  <!--   var r = new Range(0,0,0,2); -->
-  <!--   console.debug(r); -->
-  <!--   console.debug(editor.addSelectionMarker(r)); -->
-  <!-- </script> -->
   </body>
 </html>
