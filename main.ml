@@ -11,11 +11,14 @@ let setVarTest o =
 
 let _ =
   let editor : editor Js.t = Js.Unsafe.get Dom_html.window "editor" in
+  let obj = Js.string "no test running" in
   let _es = createEditSession "let x = 10" "ace/mode/ocaml" in
   editor##setSession(_es);
   let _doc = _es##getDocument() in
   require "Range";
   (* BEGIN TEST HERE *)
+
+  editor##on(Js.string "blur", (function () -> debug "coucou"));
 
   (* TEST FOR TOKENIZER *)
   (* let state1 = tokenizerState "pouet" *)
@@ -54,7 +57,7 @@ let _ =
   (* let obj = jsnew selection(_es) in *)
 
   (* TEST FOR UNDOMANAGER *)
-  let obj = jsnew undoManager() in
+  (* let obj = jsnew undoManager() in *)
 
 
   (* END TEST HERE *)

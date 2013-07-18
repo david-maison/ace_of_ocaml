@@ -90,11 +90,11 @@ let tokenizerRules tokenizerStates =
   rules
 
 
-(* TO COMPLETE (constr) *)class type tokenizer = object
+(* A TEST *)class type tokenizer = object
   method getLineTokens : int -> stateTokenOBJ -> stateAndTokenOBJ meth (* A TEST line = int or string ? state = ? res = ? *)
 end
 
-(* TO COMPLETE (constr) *)class type tokenIterator = object
+(* A TEST *)class type tokenIterator = object
   method getCurrentToken : js_string t meth (* A TEST Res = string or token? *)
   method getCurrentTokenColumn : int meth
   method getCurrentTokenRow : int meth
@@ -103,8 +103,9 @@ end
 
 end
 
-(* TO COMPLETE (on() + constr)*)class type scrollBar = object
+(* A TEST *)class type scrollBar = object
   method getWidth : int meth
+  method on : js_string t -> ('a -> unit) -> unit meth
   method onScroll : unit meth           (* A TEST (Undocumented)*)
   method setHeight : int -> unit meth
   method setInnerHeight : int -> unit meth
@@ -112,7 +113,7 @@ end
 end
 
 
-(* TO TEST *) class type range = object
+(* A TEST *) class type range = object
   method _end : pos_r t readonly_prop
   method start : pos_r t readonly_prop
 
@@ -146,7 +147,7 @@ end
 
 
 
-(* TO COMPLETE constr *)and undoManager = object
+(* A TEST *)and undoManager = object
   method execute : undoOptionsOBJ -> unit meth (* A TEST (voir doc) *)
   method hasRedo : bool t meth
   method hasUndo : bool t meth
@@ -156,7 +157,7 @@ end
 end
 
 
-(* TO COMPLETE (on() + constr) *) and document = object
+(* A TEST *) and document = object
   method applyDeltas : deltasOBJ -> unit meth
   method createAnchor : int -> int -> unit meth (* A TEST Ret = unit or anchor *)
   method getAllLines : string_array t meth        (* A TEST comportement *)
@@ -173,6 +174,7 @@ end
   method insertLines : int -> string_array t -> insertResOBJ meth   (* A TEST array+res *)
   method insertNewLine : pos_w t -> insertResOBJ meth               (* A TEST *)
   method isNewLine : js_string t -> bool t meth
+  method on : js_string t -> ('a -> unit) -> unit meth
   method positionToIndex : pos_w t -> int -> int meth (* A TEST *)
   method remove : range t -> removeResOBJ meth        (* A TEST *)
   method removeInLine : int -> int -> int -> removeResOBJ meth (* A TEST *)
@@ -184,7 +186,9 @@ end
   method setValue : js_string t -> unit meth
 end
 
-(* TO COMPLETE ( on() + constr) *) and editSession = object
+
+
+(* A TEST *) and editSession = object
   method addDynamicMarker : markerOBJ -> bool t -> markerResOBJ (* A TEST *)
   method addGutterDecoration : int -> js_string t -> unit meth
   method addMarker : range t -> js_string t -> typeMarkerOBJ -> bool t -> int meth (* A TEST *)
@@ -239,6 +243,7 @@ end
   method moveLinesDown : int -> int -> int meth		      (* A TEST *)
   method moveLinesUp : int -> int -> int meth		      (* A TEST *)
   method moveText : range t -> toPositionOBJ -> range t meth  (* A TEST *)
+  method on : js_string t -> ('a -> unit) -> unit meth
   method onChange : unit meth (* A TEST (Undocumented) *)
   method onChangeFold : unit meth (* A TEST (Undocumented) *)
   method onReloadTokenizer : objectEOBJ -> unit meth (* A TEST *)
@@ -278,25 +283,27 @@ end
 end
 
 
-(* TO COMPLETE (on() + constr)*)class type backgroundTokenizer = object
+(* A TEST *)class type backgroundTokenizer = object
   method fireUpdateEvent : int -> int -> unit meth
   method getState : int -> stateTokenOBJ meth	(* A TEST Res *)
   method getTokens : int -> tokenOBJ js_array t meth (* A TEST Res *)
+  method on : js_string t -> ('a -> unit) -> unit meth
   method setDocument : document t -> unit meth
   method setTokenizer : tokenizer t -> unit meth
   method stop : unit meth
 end
 
-(* TO COMPLETE (constr + on()  *)class type anchor = object
+(* A TEST *)class type anchor = object
   method detach : unit meth
   method getDocument : document t meth
   method getPosition : pos_r t meth     (* A TEST *)
+  method on : js_string t -> ('a -> unit) -> unit meth
   method onChange : unit meth           (* A TEST (Undocumented) *)
   method setPosition : int -> int -> bool t -> unit meth
 end
 
 
-(* TO COMPLETE constr *)class type search = object
+(* A TEST *)class type search = object
   method find : editSession t -> range t meth
   method findAll : editSession t -> range t meth (* A TEST Res = range or array *)
   method getOptions : searchOptionsOBJ meth      (* A TEST *)
@@ -313,7 +320,7 @@ class type orientedRange = object
 end
 
 
-(* TO COMPLETE (on() and constr) *)class type selection = object
+(* A TEST *)class type selection = object
   method addRange : range t -> bool t -> unit meth (* A TEST *)
   method clearSelection : unit meth
   method detach : unit meth             (* A TEST (Undocumented) *)
@@ -347,6 +354,7 @@ end
   method moveCursorUp : unit meth
   method moveCursorWordLeft : unit meth (* A TEST (Undocumented) *)
   method moveCursorWordRight : unit meth (* A TEST (Undocumented) *)
+  method on : js_string t -> ('a -> unit) -> unit meth
   method rectangularRangeBlock : cursorOBJ -> anchorOBJ -> bool t -> range t meth (* A CHANGER *)
   method selectAll : unit meth
   method selectAWord : unit meth
@@ -375,7 +383,7 @@ end
 end
 
 
-(* TO COMPLETE constr *)class type virtualRenderer = object
+(* A TEST *)class type virtualRenderer = object
   method _loadTheme : unit meth  (* A TEST (Undocumented) *)
   method addGutterDecoration : int -> js_string t -> unit meth (* DEPRECATED *)
   method adjustWrapLimit : unit meth
@@ -451,7 +459,7 @@ end
 end
 
 
-(* TO COMPLETE (on())  + constr*)class type editor = object
+(* A TEST *)class type editor = object
   method addSelectionMarker : #range t -> orientedRange t meth
   method alignCursors : unit meth
   method blockOutdent : unit meth
@@ -525,6 +533,7 @@ end
   method navigateUp : int -> unit meth
   method navigateWordLeft : unit meth
   method navigateWordRight : unit meth
+  method on : js_string t -> ('a -> unit) -> unit meth
   method onBlur : unit meth  (* A TEST (Undocumented) *)
   method onChangeAnnotation : unit meth  (* A TEST (Undocumented) *)
   method onChangeBackMarker : unit meth  (* A TEST (Undocumented) *)
@@ -622,7 +631,7 @@ let search = Unsafe.variable "ace.require(\"./search\").Search"
 let selection = Unsafe.variable "ace.require(\"./selection\").Selection"
 (* REQUIRES RANGE *)let tokenIterator = Unsafe.variable "ace.require(\"./token_iterator\").TokenIterator"
 let tokenizer = Unsafe.variable "ace.require(\"./tokenizer\").Tokenizer"
-(* A TEST *)let undoManager = Unsafe.variable "ace.require(\"./undomanager\").UndoManager"
+let undoManager = Unsafe.variable "ace.require(\"./undomanager\").UndoManager"
 let virtualRenderer = Unsafe.variable "ace.require(\"./virtual_renderer\").VirtualRenderer"
 
 

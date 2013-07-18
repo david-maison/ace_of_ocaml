@@ -25,6 +25,7 @@
      	    charset="utf-8"></script>
     <script>
       var editor = ace.edit("js_editor2");
+      var jsobj = "no test running";
       var es = ace.createEditSession("let x = 10", "ace/mode/ocaml");
       editor.setSession(es);
       var Editor = ace.require("./editor").Editor;
@@ -42,6 +43,10 @@
       var Selection = ace.require("ace/selection").Selection;
       var UndoManager = ace.require("ace/undomanager").UndoManager;
      <!-- BEGIN TEST HERE -->
+     editor.on("blur", function() { console.log("coucou2"); });
+     editor.on("blur", function() { console.log("coucou3"); });
+     //editor.onBlur = function() { console.log("coucou"); };
+     console.debug(editor);
 
       <!-- TEST FOR TOKENIZER -->
       <!-- var state = new Object(); -->
@@ -80,7 +85,7 @@
       <!-- var jsobj = new Selection(es); -->
 
       <!-- TEST FOR UNDOMANAGER -->
-      var jsobj = new UndoManager();
+      <!-- var jsobj = new UndoManager(); -->
 
       <!-- END TEST HERE -->
       test(oobj, jsobj);
