@@ -42,23 +42,31 @@
       var Search = ace.require("ace/search").Search;
       var Selection = ace.require("ace/selection").Selection;
       var UndoManager = ace.require("ace/undomanager").UndoManager;
-     <!-- BEGIN TEST HERE -->
+      <!-- BEGIN TEST HERE -->
+
+      <!-- TEST FOR RANGE -->
+      var jsobj = new Range(0,1,2,3);
+      var point = new Object();
+      point.row = 0;
+      point.column = 0;
+      var point2 = new Object();
+      point2.row = 5;
+      point2.column = 5;
+      var jsobj = Range.fromPoints(point, point2);
 
       <!-- TEST FOR TOKENIZER -->
-      var state = new Object();
-      state.regex = "let";
-      state.token = "keyword.operator";
-      var rules = new Object();
-      rules.pouet = new Array(state);
-      var jsobj = new Tokenizer(rules, "");
+      <!-- var state = new Object(); -->
+      <!-- state.regex = "let"; -->
+      <!-- state.token = "keyword.operator"; -->
+      <!-- var rules = new Object(); -->
+      <!-- rules.pouet = new Array(state); -->
+      <!-- var jsobj = new Tokenizer(rules, ""); -->
       
-      var jsobj = jsobj.getLineTokens("let a = 10", "pouet").tokens[0].value;
-
       <!-- TEST FOR BACKGROUNDTOKENIZER (REQUIRES TOKENIZER) -->
       <!-- var jsobj = new BackgroundTokenizer(jsobj, editor); -->
 
       <!-- TEST FOR TOKENITERATOR -->
-      <!-- var jsobj = new TokenIterator(es, 5, 3); -->
+      <!-- var jsobj = new TokenIterator(es, 0, 0); -->
 
       <!-- TEST FOR VIRTUALRENDERER -->
       <!-- var container = document.createElement("div"); -->

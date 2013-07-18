@@ -41,14 +41,14 @@ type cursorPos
 type style
 (* END TO BE DELETED *)
 
-class type pos_w = object
+class type point_w = object
   method row : int writeonly_prop
   method column : int writeonly_prop
 end
 
-val pos_w : int -> int -> pos_w
+val point_w : int -> int -> point_w t
 
-class type pos_r = object
+class type point = object
   method row : int readonly_prop
   method column : int readonly_prop
 end
@@ -71,24 +71,29 @@ class type tokensInfo = object
   method tokens : token t js_array t readonly_prop
 end
 
+class type tokenPos = object
+  inherit token
+  method index : int readonly_prop
+  method start : int readonly_prop
+end
+
 class type tokenizer = object
   method getLineTokens : js_string t -> js_string t -> tokensInfo t meth
 end
 
-(* A TEST *)class type tokenIterator = object
-  method getCurrentToken : js_string t meth (* A TEST Res = string or token? *)
+class type tokenIterator = object
+  method getCurrentToken : tokenPos t optdef meth
   method getCurrentTokenColumn : int meth
   method getCurrentTokenRow : int meth
-  method stepBackward : js_string t meth 	(* A TEST *)
-  method stepForward : js_string t meth		(* A TEST *)
-
+  method stepBackward : tokenPos t opt meth
+  method stepForward : tokenPos t opt meth
 end
 
 
-(* A TEST *)class type scrollBar = object
+class type scrollBar = object
   method getWidth : int meth
   method on : js_string t -> ('a -> unit) -> unit meth
-  method onScroll : unit meth           (* A TEST (Undocumented)*)
+  method onScroll : unit meth
   method setHeight : int -> unit meth
   method setInnerHeight : int -> unit meth
   method setScrollTop : int -> unit meth
@@ -96,8 +101,8 @@ end
 
 
 (* A TEST *) class type range = object
-  method _end : pos_r t readonly_prop
-  method start : pos_r t readonly_prop
+  method _end : point t readonly_prop
+  method start : point t readonly_prop
 
   method clipRows : int -> int -> range t meth
   method clone : range t meth
@@ -105,13 +110,12 @@ end
   method compare : int -> int -> int meth
   method compareEnd : int -> int -> int meth
   method compareInside : int -> int -> int meth
-  method comparePoint : range t -> int meth (* A TEST range = point ? *)
+  method comparePoint : point t -> int meth
   method compareRange : range t -> int meth
   method compareStart : int -> int -> int meth
   method contains : int -> int -> bool t meth
   method containsRange : range t -> bool t meth
-  method extend : int -> int -> range t meth (* A TEST return new range or not? *)
-  method fromPoints : range t -> range t -> range t meth (* A TEST range = point ? *)
+  method extend : int -> int -> range t meth
   method inside : int -> int -> bool t meth
   method insideEnd : int -> int -> bool t meth
   method insideStart : int -> int -> bool t meth
@@ -150,14 +154,14 @@ end
   method getNewLineMode : js_string t meth (* A TEST Res : enum or string ? *)
   method getTextRange : range t -> js_string t meth
   method getValue : js_string t meth
-  method indexToPosition : int -> int -> pos_r t meth (* A VERIF *)
-  method insert : pos_w t -> js_string t -> insertResOBJ meth (* A TEST *)
-  method insertInLine : pos_w t -> js_string t -> insertResOBJ meth (* A TEST *)
+  method indexToPosition : int -> int -> point t meth (* A VERIF *)
+  method insert : point_w t -> js_string t -> insertResOBJ meth (* A TEST *)
+  method insertInLine : point_w t -> js_string t -> insertResOBJ meth (* A TEST *)
   method insertLines : int -> string_array t -> insertResOBJ meth   (* A TEST array+res *)
-  method insertNewLine : pos_w t -> insertResOBJ meth               (* A TEST *)
+  method insertNewLine : point_w t -> insertResOBJ meth               (* A TEST *)
   method isNewLine : js_string t -> bool t meth
   method on : js_string t -> ('a -> unit) -> unit meth
-  method positionToIndex : pos_w t -> int -> int meth (* A TEST *)
+  method positionToIndex : point_w t -> int -> int meth (* A TEST *)
   method remove : range t -> removeResOBJ meth        (* A TEST *)
   method removeInLine : int -> int -> int -> removeResOBJ meth (* A TEST *)
   method removeLines : int -> int -> js_string t meth          (* A TEST *)
@@ -176,7 +180,7 @@ end
   method clearBreakpoint : int -> unit meth
   method clearBreakpoints : unit meth
   method documentToScreenColumn : int -> int -> int meth (* A TEST *)
-  method documentToScreenPosition : int -> int -> pos_r t meth (* A TEST *)
+  method documentToScreenPosition : int -> int -> point t meth (* A TEST *)
   method documentToScreenRow : int -> int -> int meth  (* A TEST *)
   method duplicateLines : int -> int -> int meth       (* A TEST *)
   method getAnnotations : annotOBJ meth		       (* A TEST *)
@@ -184,7 +188,7 @@ end
   method getBreakpoints : int js_array t meth (* A TEST *)
   method getDocument : document t meth
   method getDocumentLastRowColumn : int -> int -> int meth (* A TEST *)
-  method getDocumentLastRowColumnPosition : int -> int -> pos_r t meth (* A TEST *)
+  method getDocumentLastRowColumnPosition : int -> int -> point t meth (* A TEST *)
   method getLength : int meth
   method getLine : int -> js_string t meth
   method getLines : int -> int -> string_array t meth
@@ -218,8 +222,8 @@ end
   method highlight : unit meth (* A TEST (Undocumented) *)
   method highlightLines : unit meth (* A TEST (Undocumented) *)
   method indentRows : int -> int -> js_string t -> unit meth
-  method insert : pos_w t -> js_string t -> insertResOBJ meth (* A TEST *)
-  method isTabStop : pos_w t -> bool t meth		      (* A TEST *)
+  method insert : point_w t -> js_string t -> insertResOBJ meth (* A TEST *)
+  method isTabStop : point_w t -> bool t meth		      (* A TEST *)
   method moveLinesDown : int -> int -> int meth		      (* A TEST *)
   method moveLinesUp : int -> int -> int meth		      (* A TEST *)
   method moveText : range t -> toPositionOBJ -> range t meth  (* A TEST *)
@@ -276,7 +280,7 @@ end
 (* A TEST *)class type anchor = object
   method detach : unit meth
   method getDocument : document t meth
-  method getPosition : pos_r t meth     (* A TEST *)
+  method getPosition : point t meth     (* A TEST *)
   method on : js_string t -> ('a -> unit) -> unit meth
   method onChange : unit meth           (* A TEST (Undocumented) *)
   method setPosition : int -> int -> bool t -> unit meth
@@ -295,7 +299,7 @@ end
 
 class type orientedRange = object
   inherit range
-  method cursor : pos_r t readonly_prop
+  method cursor : point t readonly_prop
   method marker : int readonly_prop
 end
 
@@ -329,7 +333,7 @@ end
   method moveCursorShortWordLeft : unit meth (* A TEST (Undocumented) *)
   method moveCursorShortWordRight : unit meth (* A TEST (Undocumented) *)
   method moveCursorTo : int -> int -> bool t -> unit meth
-  method moveCursorToPosition : pos_w t -> unit meth (* A TEST pos_w *)
+  method moveCursorToPosition : point_w t -> unit meth (* A TEST pos_w *)
   method moveCursorToScreen : int -> int -> bool t -> unit meth
   method moveCursorUp : unit meth
   method moveCursorWordLeft : unit meth (* A TEST (Undocumented) *)
@@ -347,7 +351,7 @@ end
   method selectLineStart : unit meth
   method selectRight : unit meth
   method selectTo : int -> int -> unit meth
-  method selectToPosition : pos_w t -> unit meth (* A TEST pos_w *)
+  method selectToPosition : point_w t -> unit meth (* A TEST pos_w *)
   method selectUp : unit meth
   method selectWord : unit meth
   method selectWordLeft : unit meth
@@ -461,7 +465,7 @@ end
   method getAnimatedScroll : unit meth (* A TEST (Undocumented) *)
   method getBehavioursEnabled : bool t meth
   method getCopyText : js_string t meth
-  method getCursorPosition : pos_r t meth (* A TEST *)
+  method getCursorPosition : point t meth (* A TEST *)
   method getCursorPositionScreen : int meth (* A TEST *)
   method getDisplayIndentGuides : unit meth (* A TEST (Undocumented) *)
   method getDragDelay : int meth	    (* A TEST (int or float) *)
@@ -498,7 +502,7 @@ end
   method jumpToMatching : selectOBJ -> unit meth (* A TEST (selectOBJ) *)
   method modifyNumber : int -> unit meth
   method moveCursorTo : int -> int -> unit meth
-  method moveCursorToPosition : pos_w -> unit meth
+  method moveCursorToPosition : point_w -> unit meth
   method moveLinesDown : int meth
   method moveLinesUp : int meth
   method moveText : unit meth (* A TEST (Undocumented) *)
@@ -598,7 +602,6 @@ end
 
 
 (** CONSTRUCTORS **)
-(* No need to call requires ?? *)
 
 val anchor : (document t -> int -> int -> anchor t) constr
 val backgroundTokenizer : (tokenizer t -> editor t -> backgroundTokenizer t) constr
@@ -613,6 +616,11 @@ val selection : (editSession t -> selection t) constr
 (* TO COMPLETE : flags = enum ? *)val tokenizer : (tokenizerRules t -> js_string t -> tokenizer t) constr
 val undoManager : undoManager t constr
 val virtualRenderer : (#Dom.element t -> js_string t -> virtualRenderer t) constr
+
+
+
+(** OTHER CONSTRUCTORS **)
+val rangeFromPoints : point_w t -> point_w t -> range t
 
 
 (** ACE MAIN'S FUNCTIONS **)
