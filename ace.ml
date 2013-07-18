@@ -54,24 +54,34 @@ class type pos_r = object
 end
 
 
-(* TO COMPLETE *)type tokenizerToken = Str of js_string t | Arr of string_array t
+(* TO COMPLETE *)type tokenizerToken = Str of string | Arr of string array
 
-(* AIE AIE AIE AIE AIE *)
-type test
-type tokenizerState = string * (test js_array t)
-let tokenizerState (nameState: string) (tokensInfos: (tokenizerToken * js_string t * js_string t Opt.t) list)  =
+(* CAN BE IMPROVED *)
+type tokenizerStateItem
+type tokenizerState = string * (tokenizerStateItem js_array t)
+let tokenizerState nameState tokensItems =
   let state = jsnew array_empty() in
   let _ = List.fold_left (fun i (token, regex, next_opt) ->
-    let obj = Unsafe.obj [| "token", Unsafe.inject token ;
-                            "regex", Unsafe.inject regex |] in
-    begin match Opt.to_option next_opt with
+    let unsafe_token = match token with
+      | Str s -> Unsafe.inject (Js.string s)
+      | Arr a -> 
+	let arr = jsnew array_empty() in
+	let _ = Array.fold_left (fun i s ->
+	  array_set arr i (Js.string s);
+	  i+1) 0 a in
+	Unsafe.inject arr
+    in
+    let obj = Unsafe.obj [| "token", unsafe_token ;
+                            "regex", Unsafe.inject (Js.string regex) |] in
+    begin match next_opt with
       | None -> obj
-      | Some next -> Unsafe.set obj "next" next
+      | Some next -> Unsafe.set obj "next" (Js.string next)
     end;
     array_set state i obj;
-    i+1) 0 tokensInfos in
+    i+1) 0 tokensItems in
   (nameState, state)
-    
+
+(* CAN BE IMPROVED *)   
 type tokenizerRules
 let tokenizerRules tokenizerStates =
   let rules = Unsafe.obj [||] in
@@ -602,18 +612,18 @@ end
 (* No need to call requires ?? *)
 
 let anchor = Unsafe.variable "ace.require(\"./anchor\").Anchor"
-(* A TEST *)let backgroundTokenizer = Unsafe.variable "ace.require(\"./backgroundTokenizer\").BackgroundTokenizer"
-(* TO COMPLETE *)let document = Unsafe.variable "ace.require(\"./document\").Document"
-(* TO COMPLETE AND TEST (mode = ?)*)let editSession= Unsafe.variable "ace.require(\"./editSession\").EditSession" 
-(* A TEST *)let editor = Unsafe.variable "ace.require(\"./editor\").Editor"
+let backgroundTokenizer = Unsafe.variable "ace.require(\"./background_tokenizer\").BackgroundTokenizer"
+(* TO COMPLETE (String|Array) *)let document = Unsafe.variable "ace.require(\"./document\").Document"
+(* TO COMPLETE (TextMode = Mode or String?) *)let editSession= Unsafe.variable "ace.require(\"./edit_session\").EditSession" 
+let editor = Unsafe.variable "ace.require(\"./editor\").Editor"
 let range = Unsafe.variable "ace.require(\"./range\").Range"
-(* A TEST (Dom.element) *)let scrollBar = Unsafe.variable "ace.require(\"./scrollBar\").ScrollBar"
-(* A TEST *)let search = Unsafe.variable "ace.require(\"./search\").Search"
-(* A TEST *)let selection = Unsafe.variable "ace.require(\"./selection\").Selection"
-(* A TEST *)let tokenIterator = Unsafe.variable "ace.require(\"./tokenIterator\").TokenIterator"
-(* A TEST rules = ? *)let tokenizer = Unsafe.variable "ace.require(\"./tokenizer\").Tokenizer"
-(* A TEST *)let undoManager = Unsafe.variable "ace.require(\"./undoManager\").UndoManager"
-(* A TEST *)let virtualRenderer = Unsafe.variable "ace.require(\"./virtualRenderer\").VirtualRenderer"
+let scrollBar = Unsafe.variable "ace.require(\"./scrollbar\").ScrollBar"
+let search = Unsafe.variable "ace.require(\"./search\").Search"
+let selection = Unsafe.variable "ace.require(\"./selection\").Selection"
+(* REQUIRES RANGE *)let tokenIterator = Unsafe.variable "ace.require(\"./token_iterator\").TokenIterator"
+let tokenizer = Unsafe.variable "ace.require(\"./tokenizer\").Tokenizer"
+(* A TEST *)let undoManager = Unsafe.variable "ace.require(\"./undomanager\").UndoManager"
+let virtualRenderer = Unsafe.variable "ace.require(\"./virtual_renderer\").VirtualRenderer"
 
 
 (** ACE MAIN'S FUNCTIONS **)
@@ -635,6 +645,11 @@ let createEditSession text mode =
 (*  WARNING
     Ace's object are in native code, so in objects's constructor,
     we have to do ace.requires("./obj").Obj again to construct the object
+
+    WARNING 2
+    Some module's path aren't just uncapitalize moduleName, like
+    TokenIterator, the path is" ace/token_iterator"
+      -> create enum for moduleName ?
 *)
 let require moduleName =
   let arg = Format.sprintf "require(\"ace/%s\").%s"

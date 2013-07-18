@@ -3,7 +3,9 @@
     <script>
 
       function test(o1, o2) { 
+        console.log("Ocaml object = ");
         console.debug( o1 );
+        console.log("Javascript object = ");
         console.debug( o2 );
         <!-- ??? -->
         <!-- console.debug( o1.compare(o2) == 0 ); -->
@@ -25,14 +27,60 @@
       var editor = ace.edit("js_editor2");
       var es = ace.createEditSession("let x = 10", "ace/mode/ocaml");
       editor.setSession(es);
-      var Range = ace.require("ace/range").Range;
-      var Search = ace.require("ace/search").Search;
+      var Editor = ace.require("./editor").Editor;
+      var EditSession = ace.require("./edit_session").EditSession;
+      var Range = ace.require("./range").Range;
       var Anchor = ace.require("./anchor").Anchor;
       var Tokenizer = ace.require("./tokenizer").Tokenizer;
-      <!-- BEGIN TEST HERE -->
-      var tok = new Tokenizer();
-      console.debug(es.bgTokenizer); 
-      var jsobj = 0;
+      var TokenIterator = ace.require("ace/token_iterator").TokenIterator;
+      var BackgroundTokenizer =
+        ace.require("ace/background_tokenizer").BackgroundTokenizer;
+      var VirtualRenderer =
+        ace.require("ace/virtual_renderer").VirtualRenderer;
+      var ScrollBar = ace.require("ace/scrollbar").ScrollBar;
+      var Search = ace.require("ace/search").Search;
+      var Selection = ace.require("ace/selection").Selection;
+      var UndoManager = ace.require("ace/undomanager").UndoManager;
+     <!-- BEGIN TEST HERE -->
+
+      <!-- TEST FOR TOKENIZER -->
+      <!-- var state = new Object(); -->
+      <!-- state.regex = "let"; -->
+      <!-- state.token = "keyword.operator"; -->
+      <!-- var rules = new Object(); -->
+      <!-- rules.pouet = new Array(state); -->
+      <!-- var jsobj = new Tokenizer(rules, ""); -->
+
+      <!-- TEST FOR BACKGROUNDTOKENIZER (REQUIRES TOKENIZER) -->
+      <!-- var jsobj = new BackgroundTokenizer(jsobj, editor); -->
+
+      <!-- TEST FOR TOKENITERATOR -->
+      <!-- var jsobj = new TokenIterator(es, 5, 3); -->
+
+      <!-- TEST FOR VIRTUALRENDERER -->
+      <!-- var container = document.createElement("div"); -->
+      <!-- container.style.width = container.style.height = 200; -->
+      <!-- document.body.appendChild(container); -->
+      <!-- var jsobj = new VirtualRenderer(container, "ace/theme/chaos"); -->
+
+      <!-- TEST FOR EDITOR (REQUIRES VIRTUALRENDERER) -->
+      <!-- var new_es = new EditSession("class M { }", "ace/mode/java"); -->
+      <!-- var jsobj = new Editor(jsobj, new_es); -->
+
+      <!-- TEST FOR SCROLLBAR -->
+      <!-- var container = document.createElement("div"); -->
+      <!-- container.style.width = container.style.height = 200; -->
+      <!-- document.body.appendChild(container); -->
+      <!-- var jsobj = new ScrollBar(container); -->
+
+      <!-- TEST FOR SEARCH -->
+      <!-- var jsobj = new Search(); -->
+
+      <!-- TEST FOR SELECTION -->
+      <!-- var jsobj = new Selection(es); -->
+
+      <!-- TEST FOR UNDOMANAGER -->
+      var jsobj = new UndoManager();
 
       <!-- END TEST HERE -->
       test(oobj, jsobj);

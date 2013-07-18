@@ -395,8 +395,6 @@ var OcamlHighlightRules = function() {
             }
         ]
     };
-
-    console.debug(this);
 };
 
 oop.inherits(OcamlHighlightRules, TextHighlightRules);

@@ -1,6 +1,8 @@
 
 open Js
 
+(* Create object Mode ? *)
+
 (* TO BE DELETED *)
 type rulesOBJ
 type stateTokenOBJ
@@ -51,10 +53,10 @@ class type pos_r = object
   method column : int readonly_prop
 end
 
-(* TO COMPLETE *)type tokenizerToken = Str of js_string t | Arr of string_array t
+(* TO COMPLETE *)type tokenizerToken = Str of string | Arr of string array
 
 type tokenizerState
-val tokenizerState : string -> (tokenizerToken * js_string t * js_string t Opt.t ) list -> tokenizerState
+val tokenizerState : string -> (tokenizerToken * string * string option ) list -> tokenizerState
 
 type tokenizerRules
 val tokenizerRules : tokenizerState list -> tokenizerRules t
@@ -583,18 +585,18 @@ end
 (* No need to call requires ?? *)
 
 val anchor : (document t -> int -> int -> anchor t) constr
-(* A TEST *)val backgroundTokenizer : (tokenizer t -> editor t -> backgroundTokenizer t) constr
-(* TO COMPLETE *)val document : (js_string t -> document t) constr
-(* TO COMPLETE AND TEST (mode = ?)*)val editSession : (js_string t -> js_string t -> editSession t) constr
-(* A TEST *)val editor : (virtualRenderer t -> editSession t -> editor t) constr
+val backgroundTokenizer : (tokenizer t -> editor t -> backgroundTokenizer t) constr
+(* TO COMPLETE (String|Array) *)val document : (js_string t -> document t) constr
+(* TO COMPLETE (TextMode = Mode or String?) *)val editSession : (js_string t -> js_string t -> editSession t) constr
+val editor : (virtualRenderer t -> editSession t -> editor t) constr
 val range : (int -> int -> int -> int -> range t) constr
-(* A TEST (Dom.element) *)val scrollBar : (Dom.element t -> scrollBar t) constr
-(* A TEST *)val search : search t constr
-(* A TEST *)val selection : (editSession t -> selection t) constr
-(* A TEST *)val tokenIterator : (editSession t -> int -> int -> tokenIterator t) constr
-(* A TEST rules = ? *)val tokenizer : (rulesOBJ -> js_string t -> tokenizer t) constr
-(* A TEST *)val undoManager : undoManager t constr
-(* A TEST *)val virtualRenderer : (Dom.element t -> js_string t -> virtualRenderer t) constr
+val scrollBar : (#Dom.element t -> scrollBar t) constr
+val search : search t constr
+val selection : (editSession t -> selection t) constr
+(* REQUIRES RANGE *)val tokenIterator : (editSession t -> int -> int -> tokenIterator t) constr
+(* TO COMPLETE : flags = enum ? *)val tokenizer : (tokenizerRules t -> js_string t -> tokenizer t) constr
+val undoManager : undoManager t constr
+val virtualRenderer : (#Dom.element t -> js_string t -> virtualRenderer t) constr
 
 
 (** ACE MAIN'S FUNCTIONS **)
@@ -602,4 +604,4 @@ val range : (int -> int -> int -> int -> range t) constr
 (* TO COMPLETE *) val edit : Dom.element t -> editor t (* A TEST Dom.element ? *)
 (* TO COMPLETE *) val createEditSession : string -> string -> editSession t
 
-val require : string -> unit
+(* WARNINGS !!! *)val require : string -> unit
