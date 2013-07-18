@@ -2,9 +2,7 @@
 open Js
 
 (* TO BE DELETED *)
-type rulesOBJ
 type stateTokenOBJ
-type stateAndTokenOBJ
 type offsetOBJ
 type coordOBJ
 type undoOptionsOBJ
@@ -89,10 +87,23 @@ let tokenizerRules tokenizerStates =
     Unsafe.set rules name state) tokenizerStates;
   rules
 
-
-(* A TEST *)class type tokenizer = object
-  method getLineTokens : int -> stateTokenOBJ -> stateAndTokenOBJ meth (* A TEST line = int or string ? state = ? res = ? *)
+class type token = object
+  method _type : js_string t readonly_prop
+  method value : js_string t readonly_prop 
 end
+
+class type tokensInfo = object
+  method state : js_string t readonly_prop
+  method tokens : token t js_array t readonly_prop
+end
+
+class type tokenizer = object
+  (* Signature : line -> state -> tokensInfo
+     state = un des states du tokenizer
+       si state n'est pas connu dans le tokenizer, ça échoue *)
+  method getLineTokens : js_string t -> js_string t -> tokensInfo t meth
+end
+
 
 (* A TEST *)class type tokenIterator = object
   method getCurrentToken : js_string t meth (* A TEST Res = string or token? *)

@@ -18,13 +18,15 @@ let _ =
   require "Range";
   (* BEGIN TEST HERE *)
 
-  editor##on(Js.string "blur", (function () -> debug "coucou"));
-
   (* TEST FOR TOKENIZER *)
-  (* let state1 = tokenizerState "pouet" *)
-  (*   [Str ("keyword.operator"), "let", None] in *)
-  (* let rules = tokenizerRules [state1] in *)
-  (* let obj = jsnew tokenizer(rules, Js.string "") in *)
+  let state1 = tokenizerState "pouet"
+    [Str ("keyword.operator"), "let", None] in
+  let rules = tokenizerRules [state1] in
+  let obj = jsnew tokenizer(rules, Js.string "") in
+
+  let obj = obj##getLineTokens(Js.string "let a = 10", Js.string "pouet")##tokens in
+  let obj = to_array obj in
+  let obj = (obj.(0))##value in
 
   (* TEST FOR BACKGROUNDTOKENIZER (REQUIRES TOKENIZER) *)
   (* let obj = jsnew backgroundTokenizer(obj, editor) in *)

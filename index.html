@@ -43,18 +43,16 @@
       var Selection = ace.require("ace/selection").Selection;
       var UndoManager = ace.require("ace/undomanager").UndoManager;
      <!-- BEGIN TEST HERE -->
-     editor.on("blur", function() { console.log("coucou2"); });
-     editor.on("blur", function() { console.log("coucou3"); });
-     //editor.onBlur = function() { console.log("coucou"); };
-     console.debug(editor);
 
       <!-- TEST FOR TOKENIZER -->
-      <!-- var state = new Object(); -->
-      <!-- state.regex = "let"; -->
-      <!-- state.token = "keyword.operator"; -->
-      <!-- var rules = new Object(); -->
-      <!-- rules.pouet = new Array(state); -->
-      <!-- var jsobj = new Tokenizer(rules, ""); -->
+      var state = new Object();
+      state.regex = "let";
+      state.token = "keyword.operator";
+      var rules = new Object();
+      rules.pouet = new Array(state);
+      var jsobj = new Tokenizer(rules, "");
+      
+      var jsobj = jsobj.getLineTokens("let a = 10", "pouet").tokens[0].value;
 
       <!-- TEST FOR BACKGROUNDTOKENIZER (REQUIRES TOKENIZER) -->
       <!-- var jsobj = new BackgroundTokenizer(jsobj, editor); -->

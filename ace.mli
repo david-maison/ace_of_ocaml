@@ -6,9 +6,7 @@ open Js
      -> do method addEventBlur(function()) *)
 
 (* TO BE DELETED *)
-type rulesOBJ
 type stateTokenOBJ
-type stateAndTokenOBJ
 type offsetOBJ
 type coordOBJ
 type undoOptionsOBJ
@@ -63,9 +61,18 @@ val tokenizerState : string -> (tokenizerToken * string * string option ) list -
 type tokenizerRules
 val tokenizerRules : tokenizerState list -> tokenizerRules t
 
+class type token = object
+  method _type : js_string t readonly_prop
+  method value : js_string t readonly_prop 
+end
 
-(* A TEST *)class type tokenizer = object
-  method getLineTokens : int -> stateTokenOBJ -> stateAndTokenOBJ meth (* A TEST line = int or string ? state = ? res = ? *)
+class type tokensInfo = object
+  method state : js_string t readonly_prop
+  method tokens : token t js_array t readonly_prop
+end
+
+class type tokenizer = object
+  method getLineTokens : js_string t -> js_string t -> tokensInfo t meth
 end
 
 (* A TEST *)class type tokenIterator = object
