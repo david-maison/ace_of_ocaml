@@ -24,13 +24,11 @@ type limitOBJ
 type insertResOBJ
 type toPositionOBJ
 type objectEOBJ
-type deltaOBJ
 type removeResOBJ
 type replaceResOBJ
 type posResOBJ
 type scrollLeftOBJ
 type scrollTopIBJ
-type deltasOBJ
 type replaceOptions
 type callbackOBJ
 type cursorPos
@@ -50,6 +48,8 @@ class type point = object
   method row : int readonly_prop
   method column : int readonly_prop
 end
+
+
 
 
 (* TO COMPLETE *)type tokenizerToken = Str of string | Arr of string array
@@ -128,8 +128,23 @@ class type scrollBar = object
   method setScrollTop : int -> unit meth
 end
 
+type undoExecuteOptions = Unsafe.any js_array
 
-(* A TEST *) class type range = object
+type deltaAction = InsertLines | InsertText | RemoveLines | RemoveText
+class type delta = object
+  (* (action : prop defined)
+     insertText : text
+     insertLines : lines
+     removeText : text
+     removeLines : nl lines *)
+  method action : js_string t readonly_prop
+  method lines : js_string t js_array t optdef readonly_prop
+  method nl : js_string t optdef readonly_prop
+  method range : range t readonly_prop
+  method text : js_string t optdef readonly_prop
+end
+
+and range = object
   method _end : point t readonly_prop
   method start : point t readonly_prop
 
@@ -144,36 +159,39 @@ end
   method compareStart : int -> int -> int meth
   method contains : int -> int -> bool t meth
   method containsRange : range t -> bool t meth
-  method extend : int -> int -> range t meth (* Ne modifie pas l'object *)
+  method extend : int -> int -> range t meth (* Ne modifie pas l'objet *)
   method inside : int -> int -> bool t meth
   method insideEnd : int -> int -> bool t meth
   method insideStart : int -> int -> bool t meth
   method intersects : range t -> bool t meth
-  method isEmpty : unit meth            (* A TEST (Undocumented) *)
+  method isEmpty : bool t meth
   method isEnd : int -> int -> bool t meth
   method isEqual : range t -> bool t meth
   method isMultiLine : bool t meth
   method isStart : int -> int -> bool t meth
   method setEnd : int -> int -> unit meth
   method setStart : int -> int -> unit meth
-  method toScreenRange : editSession t -> range t meth (* A TEST effet = ? *)
+  method toScreenRange : editSession t -> range t meth (*Ne modifie pas l'objet*)
   method toString : js_string t meth
 end
 
 
 
 (* A TEST *)and undoManager = object
-  method execute : undoOptionsOBJ -> unit meth (* A TEST (voir doc) *)
+  method dirtyCounter : int readonly_prop
+  method doc : editSession t optdef readonly_prop
+
+  method execute : undoExecuteOptions t -> unit meth (* A TEST (delta) *)
   method hasRedo : bool t meth
   method hasUndo : bool t meth
-  method redo : bool t -> unit meth     (* A TEST = res = unit ? *)
+  method redo : bool t -> range t opt meth
   method reset : unit meth
-  method undo : bool t -> range t meth  (* A TEST = res = range ? *)
+  method undo : bool t -> range t opt meth
 end
 
 
 (* A TEST *) and document = object
-  method applyDeltas : deltasOBJ -> unit meth
+  method applyDeltas : delta t js_array t -> unit meth
   method createAnchor : int -> int -> unit meth (* A TEST Ret = unit or anchor *)
   method getAllLines : string_array t meth        (* A TEST comportement *)
   method getLength : int meth
@@ -196,7 +214,7 @@ end
   method removeLines : int -> int -> js_string t meth          (* A TEST *)
   method removeNewLine : int -> removeResOBJ                   (* A TEST *)
   method replace : range t -> js_string t -> replaceResOBJ meth (* A TEST *)
-  method revertDeltas : deltasOBJ -> unit meth                  (* A TEST *)
+  method revertDeltas : delta t js_array t -> unit meth                  (* A TEST *)
   method setNewLineMode : js_string t -> unit meth
   method setValue : js_string t -> unit meth
 end
@@ -264,7 +282,7 @@ end
   method onReloadTokenizer : objectEOBJ -> unit meth (* A TEST *)
   method outdentRows : range t -> unit meth
   method redo : unit meth (* A TEST (Undocumented) *)
-  method redoChanges : deltaOBJ js_array t -> bool t -> range t meth (* A TEST *)
+  method redoChanges : delta t js_array t -> bool t -> range t meth (* A TEST *)
   method remove : range t -> removeResOBJ meth (* A TEST *)
   method removeGutterDecoration : int -> js_string t -> unit meth
   method removeMarker : int -> unit 	(* A TEST : markerId *)
@@ -294,7 +312,7 @@ end
   method toggleOverwrite : unit meth
   method toString : js_string t meth
   method undo : unit meth (* A TEST (Undocumented) *)
-  method undoChanges : deltasOBJ -> bool t -> range t meth (* A TEST *)
+  method undoChanges : delta t js_array t -> bool t -> range t meth (* A TEST *)
 end
 
 
@@ -656,6 +674,31 @@ let rangeFromPoints pStart pEnd = (* No need to requires "Range" ? *)
   Unsafe.meth_call (Unsafe.variable "ace.require(\"./range\").Range")
     "fromPoints"
     [| Unsafe.inject pStart ; Unsafe.inject pEnd |]
+
+let undoExecuteOptions deltas document =
+  let arr = jsnew array_empty() in
+  array_set arr 0 (Unsafe.inject deltas);
+  array_set arr 1 (Unsafe.inject document);
+  arr
+
+let delta action ?(text="") ?(nl="") ?(lines=[||]) range =
+  let obj = Unsafe.obj [| "range" , Unsafe.inject range |] in
+  (match action with
+    | InsertLines ->
+        Unsafe.set obj "action" (Js.string "insertLines");
+        Unsafe.set obj "lines" (Utils.to_js_string_array lines)
+    | InsertText ->
+        Unsafe.set obj "action" (Js.string "insertText");
+        Unsafe.set obj "text" (Js.string text)
+    | RemoveLines ->
+        Unsafe.set obj "action" (Js.string "removeLines");
+        Unsafe.set obj "lines" (Utils.to_js_string_array lines);
+        Unsafe.set obj "nl" (Js.string nl)
+    | RemoveText ->
+        Unsafe.set obj "action" (Js.string "removeText");
+        Unsafe.set obj "text" (Js.string text));
+  obj
+
 
 (** ACE MAIN'S FUNCTIONS **)
 
