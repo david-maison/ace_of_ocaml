@@ -7,9 +7,11 @@ CAMLFIND = ocamlfind
 CAMLJS = $(CAMLFIND) $(CAMLC) $(JSPKGS) $(FLAGS) 
 
 all: 
+	$(CAMLJS) -c utils.mli
+	$(CAMLJS) -c utils.ml
 	$(CAMLJS) -c ace.mli
 	$(CAMLJS) -c ace.ml
-	$(CAMLJS) -o main.byte ace.cmo main.ml
+	$(CAMLJS) -o main.byte utils.cmo ace.cmo main.ml
 	js_of_ocaml main.byte
 
 clean:
