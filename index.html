@@ -28,6 +28,7 @@
       var jsobj = "no test running";
       var es = ace.createEditSession("let x = 10", "ace/mode/ocaml");
       editor.setSession(es);
+      var doc = es.getDocument();
       var Editor = ace.require("./editor").Editor;
       var EditSession = ace.require("./edit_session").EditSession;
       var Range = ace.require("./range").Range;
@@ -45,14 +46,14 @@
       <!-- BEGIN TEST HERE -->
 
       <!-- TEST FOR RANGE -->
-      var jsobj = new Range(0,1,2,3);
-      var point = new Object();
-      point.row = 0;
-      point.column = 0;
-      var point2 = new Object();
-      point2.row = 5;
-      point2.column = 5;
-      var jsobj = Range.fromPoints(point, point2);
+      <!-- var jsobj = new Range(0,1,2,3); -->
+
+      <!-- TEST FOR DELTAS -->
+      <!-- var deltas = [{ action: "insertText" , range: jsobj , text: "pouet" }]; -->
+      <!-- var delta_array = { deltas: deltas , group: "doc" }; -->
+      var p = {row:0, column:4};
+      var jsobj = doc.insertNewLine(p);
+      
 
       <!-- TEST FOR TOKENIZER -->
       <!-- var state = new Object(); -->

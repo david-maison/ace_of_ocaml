@@ -39,13 +39,6 @@ type cursorPos
 type style
 (* END TO BE DELETED *)
 
-(* TO BE DELETED *)
-class type point_w = object
-  method row : int writeonly_prop
-  method column : int writeonly_prop
-end
-
-val point_w : int -> int -> point_w t
 
 class type point = object
   method row : int readonly_prop
@@ -102,7 +95,7 @@ end
 
 type undoExecuteOptions
 
-type deltaAction = InsertLines | InsertText | RemoveLines | RemoveText
+
 class type delta = object
   method action : js_string t readonly_prop
   method lines : js_string t js_array t optdef readonly_prop
@@ -110,6 +103,21 @@ class type delta = object
   method range : range t readonly_prop
   method text : js_string t optdef readonly_prop
 end
+
+and delta_array = object
+  method deltas : delta t js_array t readonly_prop
+  method group : js_string t readonly_prop
+end
+
+(* A TEST *)and anchor = object
+  method detach : unit meth
+  method getDocument : document t meth
+  method getPosition : point t meth     (* A TEST *)
+  method on : js_string t -> ('a -> unit) -> unit meth
+  method onChange : unit meth           (* A TEST (Undocumented) *)
+  method setPosition : int -> int -> bool t -> unit meth
+end
+
 
 and range = object
   method _end : point t readonly_prop
@@ -143,11 +151,11 @@ and range = object
 end
 
 
-(* A TEST *)and undoManager = object
-  method dirtyCounter : int readonly_prop
-  method doc : editSession t optdef readonly_prop
+and undoManager = object
+  (* method dirtyCounter : int readonly_prop *)
+  (* method doc : editSession t optdef readonly_prop *)
 
-  method execute : undoExecuteOptions t -> unit meth (* A TEST (delta) *)
+  method execute : undoExecuteOptions t -> unit meth
   method hasRedo : bool t meth
   method hasUndo : bool t meth
   method redo : bool t -> range t opt meth
@@ -156,31 +164,31 @@ end
 end
 
 
-(* A TEST *) and document = object
+and document = object
   method applyDeltas : delta t js_array t -> unit meth
-  method createAnchor : int -> int -> unit meth (* A TEST Ret = unit or anchor *)
-  method getAllLines : string_array t meth        (* A TEST comportement *)
+  method createAnchor : int -> int -> anchor t meth
+  method getAllLines : js_string t js_array t meth
   method getLength : int meth
   method getLine : int -> js_string t meth
-  method getLines : int -> int -> string_array t meth (* A TEST comportement *)
+  method getLines : int -> int -> js_string t js_array t meth
   method getNewLineCharacter : js_string t meth
-  method getNewLineMode : js_string t meth (* A TEST Res : enum or string ? *)
+  method getNewLineMode : js_string t meth
   method getTextRange : range t -> js_string t meth
   method getValue : js_string t meth
-  method indexToPosition : int -> int -> point t meth (* A VERIF *)
-  method insert : point_w t -> js_string t -> insertResOBJ meth (* A TEST *)
-  method insertInLine : point_w t -> js_string t -> insertResOBJ meth (* A TEST *)
-  method insertLines : int -> string_array t -> insertResOBJ meth   (* A TEST array+res *)
-  method insertNewLine : point_w t -> insertResOBJ meth               (* A TEST *)
+  method indexToPosition : int -> int -> point t meth 
+  method insert : point t -> js_string t -> point t meth
+  method insertInLine : point t -> js_string t -> point t meth
+  method insertLines : int -> js_string t js_array t -> point t meth
+  method insertNewLine : point t -> point t meth
   method isNewLine : js_string t -> bool t meth
   method on : js_string t -> ('a -> unit) -> unit meth
-  method positionToIndex : point_w t -> int -> int meth (* A TEST *)
-  method remove : range t -> removeResOBJ meth        (* A TEST *)
-  method removeInLine : int -> int -> int -> removeResOBJ meth (* A TEST *)
-  method removeLines : int -> int -> js_string t meth          (* A TEST *)
-  method removeNewLine : int -> removeResOBJ                   (* A TEST *)
-  method replace : range t -> js_string t -> replaceResOBJ meth (* A TEST *)
-  method revertDeltas : delta t js_array t -> unit meth                  (* A TEST *)
+  method positionToIndex : point t -> int -> int meth
+  method remove : range t -> point t meth
+  method removeInLine : int -> int -> int -> point t meth
+  method removeLines : int -> int -> js_string t js_array t meth
+  method removeNewLine : int -> unit meth
+  method replace : range t -> js_string t -> point t meth
+  method revertDeltas : delta t js_array t -> unit meth
   method setNewLineMode : js_string t -> unit meth
   method setValue : js_string t -> unit meth
 end
@@ -235,8 +243,8 @@ end
   method highlight : unit meth (* A TEST (Undocumented) *)
   method highlightLines : unit meth (* A TEST (Undocumented) *)
   method indentRows : int -> int -> js_string t -> unit meth
-  method insert : point_w t -> js_string t -> insertResOBJ meth (* A TEST *)
-  method isTabStop : point_w t -> bool t meth		      (* A TEST *)
+  method insert : point t -> js_string t -> insertResOBJ meth (* A TEST *)
+  method isTabStop : point t -> bool t meth		      (* A TEST *)
   method moveLinesDown : int -> int -> int meth		      (* A TEST *)
   method moveLinesUp : int -> int -> int meth		      (* A TEST *)
   method moveText : range t -> toPositionOBJ -> range t meth  (* A TEST *)
@@ -290,15 +298,6 @@ end
   method stop : unit meth
 end
 
-(* A TEST *)class type anchor = object
-  method detach : unit meth
-  method getDocument : document t meth
-  method getPosition : point t meth     (* A TEST *)
-  method on : js_string t -> ('a -> unit) -> unit meth
-  method onChange : unit meth           (* A TEST (Undocumented) *)
-  method setPosition : int -> int -> bool t -> unit meth
-end
-
 
 (* A TEST *)class type search = object
   method find : editSession t -> range t meth
@@ -346,7 +345,7 @@ end
   method moveCursorShortWordLeft : unit meth (* A TEST (Undocumented) *)
   method moveCursorShortWordRight : unit meth (* A TEST (Undocumented) *)
   method moveCursorTo : int -> int -> bool t -> unit meth
-  method moveCursorToPosition : point_w t -> unit meth (* A TEST pos_w *)
+  method moveCursorToPosition : point t -> unit meth (* A TEST pos_w *)
   method moveCursorToScreen : int -> int -> bool t -> unit meth
   method moveCursorUp : unit meth
   method moveCursorWordLeft : unit meth (* A TEST (Undocumented) *)
@@ -364,7 +363,7 @@ end
   method selectLineStart : unit meth
   method selectRight : unit meth
   method selectTo : int -> int -> unit meth
-  method selectToPosition : point_w t -> unit meth (* A TEST pos_w *)
+  method selectToPosition : point t -> unit meth (* A TEST pos_w *)
   method selectUp : unit meth
   method selectWord : unit meth
   method selectWordLeft : unit meth
@@ -515,7 +514,7 @@ end
   method jumpToMatching : selectOBJ -> unit meth (* A TEST (selectOBJ) *)
   method modifyNumber : int -> unit meth
   method moveCursorTo : int -> int -> unit meth
-  method moveCursorToPosition : point_w -> unit meth
+  method moveCursorToPosition : point t -> unit meth
   method moveLinesDown : int meth
   method moveLinesUp : int meth
   method moveText : unit meth (* A TEST (Undocumented) *)
@@ -633,14 +632,16 @@ val virtualRenderer : (#Dom.element t -> js_string t -> virtualRenderer t) const
 
 
 (** OTHER CONSTRUCTORS **)
-val rangeFromPoints : point_w t -> point_w t -> range t
-val undoExecuteOptions : delta t js_array t -> document t -> undoExecuteOptions t
-val delta : deltaAction -> ?text:string -> ?nl:string -> ?lines:string array -> range t -> delta t 
+val point : int -> int -> point t
+val rangeFromPoints : point t -> point t -> range t
+val undoExecuteOptions : delta_array t -> editSession t -> undoExecuteOptions t
+val delta : js_string t -> range t -> js_string t optdef -> js_string t optdef -> js_string t js_array t optdef -> delta t
+val delta_array : delta t js_array t -> js_string t -> delta_array t 
 
 
 (** ACE MAIN'S FUNCTIONS **)
 
 (* TO COMPLETE *) val edit : Dom.element t -> editor t (* A TEST Dom.element ? *)
-(* TO COMPLETE *) val createEditSession : string -> string -> editSession t
+(* TO COMPLETE *) val createEditSession : js_string t -> js_string t -> editSession t
 
 (* WARNINGS !!! *)val require : string -> unit

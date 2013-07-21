@@ -12,7 +12,7 @@ let setVarTest o =
 let _ =
   let editor : editor Js.t = Js.Unsafe.get Dom_html.window "editor" in
   let obj = Js.string "no test running" in
-  let _es = createEditSession "let x = 10" "ace/mode/ocaml" in
+  let _es = createEditSession (Js.string "let x = 10") (Js.string "ace/mode/ocaml") in
   editor##setSession(_es);
   let _doc = _es##getDocument() in
   require "Range";
@@ -20,10 +20,13 @@ let _ =
 
   (* TEST FOR RANGE *)
   let obj = jsnew range(0,1,2,3) in
-  let p1 = point_w 0 0 in
-  let p2 = point_w 5 5 in
-  let obj = rangeFromPoints p1 p2 in
 
+  (* TEST FOR DELTAS *)
+  (* let obj = delta (Js.string "insertText") obj (def (Js.string "pouet")) undefined undefined in *)
+  (* let deltas = jsnew array_length(1) in *)
+  (* array_set deltas 0 obj; *)
+  (* let obj = delta_array deltas (Js.string "doc") in *)
+  let obj = _doc##insert(point 0 4, Js.string "coucou") in
   
   (* TEST FOR TOKENIZER *)
   (* let state1 = tokenizerState "pouet" *)
@@ -68,7 +71,6 @@ let _ =
 
   (* TEST FOR UNDOMANAGER *)
   (* let obj = jsnew undoManager() in *)
-
 
   (* END TEST HERE *)
   setVarTest obj
