@@ -33,6 +33,27 @@ type replaceOptions
 type callbackOBJ
 type cursorPos
 type style
+(* END TO BE DELETED *)
+
+
+(* UNSAFE *)
+type typeMarker = Unsafe.any
+let typeMarker_of_string str = Unsafe.inject str
+let typeMarker_of_function f = Unsafe.inject f
+(* END UNSAFE *)
+
+(* UNSAFE *)
+class type annotation = object
+end
+(* END UNSAFE *)
+
+class type ['a] event = object
+  method data : 'a readonly_prop
+end
+
+let event data =
+  Unsafe.obj [| "data" , Unsafe.inject data |]
+
 
 class type point = object
   method row : int readonly_prop
@@ -136,12 +157,12 @@ and delta_array = object
   method group : js_string t readonly_prop
 end
 
-(* A TEST *)and anchor = object
+and anchor = object
   method detach : unit meth
   method getDocument : document t meth
-  method getPosition : point t meth     (* A TEST *)
+  method getPosition : point t meth
   method on : js_string t -> ('a -> unit) -> unit meth
-  method onChange : unit meth           (* A TEST (Undocumented) *)
+  method onChange : delta t event t -> unit meth
   method setPosition : int -> int -> bool t -> unit meth
 end
 
@@ -176,7 +197,17 @@ and range = object
   method toString : js_string t meth
 end
 
-
+(* SO CLOUDY (to do : constr) *)and marker = object
+  (* method cache : ??? js_array t optdef readonly_prop *) (* ??? *)
+  method clazz : js_string t readonly_prop
+  method id : int readonly_prop
+  method inFront : bool t readonly_prop
+  method range : range t optdef readonly_prop
+  method regExp : js_string t optdef readonly_prop
+  (* method renderer : ??? opt optdef readonly_prop *) (* ??? *)
+  method _type : typeMarker readonly_prop
+  (* method update : ??? optdef readonly_prop *) (* ??? *)
+end
 
 and undoManager = object
   (* method dirtyCounter : int readonly_prop *)
@@ -223,27 +254,27 @@ end
 
 
 (* A TEST *) and editSession = object
-  method addDynamicMarker : markerOBJ -> bool t -> markerResOBJ (* A TEST *)
+  method addDynamicMarker : marker t -> bool t -> marker t meth (* MARKER A TEST *)
   method addGutterDecoration : int -> js_string t -> unit meth
-  method addMarker : range t -> js_string t -> typeMarkerOBJ -> bool t -> int meth (* A TEST *)
+  method addMarker : range t -> js_string t -> typeMarker -> bool t -> int meth (* TYPEMARKER A TEST *)
   method clearAnnotations : unit meth
   method clearBreakpoint : int -> unit meth
   method clearBreakpoints : unit meth
-  method documentToScreenColumn : int -> int -> int meth (* A TEST *)
-  method documentToScreenPosition : int -> int -> point t meth (* A TEST *)
-  method documentToScreenRow : int -> int -> int meth  (* A TEST *)
-  method duplicateLines : int -> int -> int meth       (* A TEST *)
-  method getAnnotations : annotOBJ meth		       (* A TEST *)
+  method documentToScreenColumn : int -> int -> int meth
+  method documentToScreenPosition : int -> int -> point t meth
+  method documentToScreenRow : int -> int -> int meth
+  method duplicateLines : int -> int -> int meth
+  method getAnnotations : annotation t js_array t meth (* UNSAFE *)
   method getAWordRange : int -> int -> range t meth
-  method getBreakpoints : int js_array t meth (* A TEST *)
+  method getBreakpoints : int js_array t meth
   method getDocument : document t meth
-  method getDocumentLastRowColumn : int -> int -> int meth (* A TEST *)
-  method getDocumentLastRowColumnPosition : int -> int -> point t meth (* A TEST *)
+  method getDocumentLastRowColumn : int -> int -> int meth
+  method getDocumentLastRowColumnPosition : int -> int -> point t meth
   method getLength : int meth
   method getLine : int -> js_string t meth
   method getLines : int -> int -> string_array t meth
-  method getMarkers : bool t -> markerOBJ js_array meth (* A TEST *)
-  method getMode : js_string t meth			(* A TEST *)
+  method getMarkers : bool t -> marker t optdef js_array t meth (* UNSAFE : Return an object with field "1" "2" ... like an array with offset 1 to n (0 = undefined, length = undefined) *)
+  method getMode : mode t meth (* UNSAFE *)
   method getNewLineMode : js_string t meth
   method getOverwrite : bool t meth
   method getRowLength : int -> int meth

@@ -45,14 +45,18 @@
       var UndoManager = ace.require("ace/undomanager").UndoManager;
       <!-- BEGIN TEST HERE -->
 
+      <!-- TEST FOR ANCHOR -->
+      var jsobj = new Anchor(doc, 0, 3);
+      <!-- var jsobj = jsobj.getPosition(); -->
+
       <!-- TEST FOR RANGE -->
       <!-- var jsobj = new Range(0,1,2,3); -->
 
       <!-- TEST FOR DELTAS -->
       <!-- var deltas = [{ action: "insertText" , range: jsobj , text: "pouet" }]; -->
       <!-- var delta_array = { deltas: deltas , group: "doc" }; -->
-      var p = {row:0, column:4};
-      var jsobj = doc.insertNewLine(p);
+      <!-- var p = {row:0, column:4}; -->
+      <!-- var jsobj = doc.insertNewLine(p); -->
       
 
       <!-- TEST FOR TOKENIZER -->

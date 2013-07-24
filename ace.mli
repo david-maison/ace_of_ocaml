@@ -40,6 +40,18 @@ type style
 (* END TO BE DELETED *)
 
 
+(* UNSAFE *)
+type typeMarker
+val typeMarker_of_string : js_string t -> typeMarker
+val typeMarker_of_function : ('a -> 'b) -> typeMarker
+(* END UNSAFE *)
+
+class type ['a] event = object
+  method data : 'a readonly_prop
+end
+
+val event : 'a -> 'a event t
+
 class type point = object
   method row : int readonly_prop
   method column : int readonly_prop
@@ -64,6 +76,7 @@ class type tokensInfo = object
   method tokens : token t js_array t readonly_prop
 end
 
+(* Fusionner avec token et mettre des undefined ? *)
 class type tokenPos = object
   inherit token
   method index : int readonly_prop
@@ -109,12 +122,12 @@ and delta_array = object
   method group : js_string t readonly_prop
 end
 
-(* A TEST *)and anchor = object
+and anchor = object
   method detach : unit meth
   method getDocument : document t meth
-  method getPosition : point t meth     (* A TEST *)
+  method getPosition : point t meth
   method on : js_string t -> ('a -> unit) -> unit meth
-  method onChange : unit meth           (* A TEST (Undocumented) *)
+  method onChange : delta t event t -> unit meth
   method setPosition : int -> int -> bool t -> unit meth
 end
 
@@ -151,6 +164,17 @@ and range = object
 end
 
 
+(* SO CLOUDY (to do : constr) *)and marker = object
+  (* method cache : ??? js_array t optdef readonly_prop *) (* ??? *)
+  method clazz : js_string t readonly_prop
+  method id : int readonly_prop
+  method inFront : bool t readonly_prop
+  method range : range t optdef readonly_prop
+  method regExp : js_string t optdef readonly_prop
+  (* method renderer : ??? opt optdef readonly_prop *) (* ??? *)
+  method _type : typeMarker readonly_prop
+end
+
 and undoManager = object
   (* method dirtyCounter : int readonly_prop *)
   (* method doc : editSession t optdef readonly_prop *)
@@ -163,6 +187,25 @@ and undoManager = object
   method undo : bool t -> range t opt meth
 end
 
+(* UNSAFE *)
+and matchingBraceOutdent = object
+  (* method autoOutdent : document t -> int -> unit meth *)
+  (* method checkOutdent : js_string t -> js_string t -> bool t meth *)
+end
+(* END UNSAFE *)
+
+(* UNSAFE *)
+and mode = object
+  (* method id : js_string t readonly_prop (\* $id ??? *\) *)
+  (* method outdent : matchingBraceOutdent t readonly_prop (\* $outdent ??? *\) *)
+  (* method tokenizer : tokenizer t readonly_prop          (\* $tokenizer ??? *\) *)
+
+  method autoOutdent : js_string t -> document t -> int -> unit meth
+  method checkOutdent : js_string t -> js_string t -> js_string t -> bool t meth
+  method getNextLineIndent : js_string t -> js_string t -> js_string t -> js_string t meth
+  method toggleCommentLines : js_string t -> document t -> int -> int -> unit meth
+end
+(* END UNSAFE *)
 
 and document = object
   method applyDeltas : delta t js_array t -> unit meth
@@ -194,44 +237,44 @@ and document = object
 end
 
 (* A TEST *) and editSession = object
-  method addDynamicMarker : markerOBJ -> bool t -> markerResOBJ (* A TEST *)
+  method addDynamicMarker : marker t -> bool t -> marker t meth (* UNSAFE *)
   method addGutterDecoration : int -> js_string t -> unit meth
-  method addMarker : range t -> js_string t -> typeMarkerOBJ -> bool t -> int meth (* A TEST *)
+  method addMarker : range t -> js_string t -> typeMarker -> bool t -> int meth (* UNSAFE *)
   method clearAnnotations : unit meth
   method clearBreakpoint : int -> unit meth
   method clearBreakpoints : unit meth
-  method documentToScreenColumn : int -> int -> int meth (* A TEST *)
-  method documentToScreenPosition : int -> int -> point t meth (* A TEST *)
-  method documentToScreenRow : int -> int -> int meth  (* A TEST *)
-  method duplicateLines : int -> int -> int meth       (* A TEST *)
-  method getAnnotations : annotOBJ meth		       (* A TEST *)
+  method documentToScreenColumn : int -> int -> int meth
+  method documentToScreenPosition : int -> int -> point t meth
+  method documentToScreenRow : int -> int -> int meth
+  method duplicateLines : int -> int -> int meth
+  method getAnnotations : annotation t js_array t meth (* UNSAFE *)
   method getAWordRange : int -> int -> range t meth
-  method getBreakpoints : int js_array t meth (* A TEST *)
+  method getBreakpoints : int js_array t meth 
   method getDocument : document t meth
-  method getDocumentLastRowColumn : int -> int -> int meth (* A TEST *)
-  method getDocumentLastRowColumnPosition : int -> int -> point t meth (* A TEST *)
+  method getDocumentLastRowColumn : int -> int -> int meth
+  method getDocumentLastRowColumnPosition : int -> int -> point t meth
   method getLength : int meth
   method getLine : int -> js_string t meth
   method getLines : int -> int -> string_array t meth
-  method getMarkers : bool t -> markerOBJ js_array meth (* A TEST *)
-  method getMode : js_string t meth			(* A TEST *)
+  method getMarkers : bool t -> marker t optdef js_array t meth (* UNSAFE *)
+  method getMode : mode t meth	(* UNSAFE *)
   method getNewLineMode : js_string t meth
   method getOverwrite : bool t meth
   method getRowLength : int -> int meth
-  method getRowSplitData : int -> js_string t meth (* A TEST (object row et res ? *)
-  method getScreenLastRowColumn : int -> int meth  (* A TEST : int or pos? *)
+  method getRowSplitData : int -> js_string t js_array t optdef meth (* A TEST *)
+  method getScreenLastRowColumn : int -> int meth
   method getScreenLength : int meth
   method getScreenTabSize : int -> int meth
   method getScreenWidth : int meth
   method getScrollLeft : int meth
   method getScrollTop : int meth
   method getSelection : js_string t meth
-  method getState : int -> stateUnknownOBJ meth (* A TEST *)
+  method getState : int -> js_string t meth
   method getTabSize : int meth
-  method getTabString : js_string t meth (* A TEST *)
+  method getTabString : js_string t meth
   method getTextRange : range t -> js_string t meth
-  method getTokenAt : int -> int -> tokenOBJ meth (* A TEST *)
-  method getTokens : int -> tokenarrayOBJ meth	  (* A TEST *)
+  method getTokenAt : int -> int -> tokenPos t meth
+  method getTokens : int -> token t js_array t meth (* ou tokenPos s'ils ont été vu par le getTokenAt *)
   method getUndoManager : undoManager meth
   method getUseSoftTabs : bool t meth
   method getUseWorker : bool t meth

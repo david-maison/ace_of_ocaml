@@ -19,15 +19,19 @@ let _ =
   (* BEGIN TEST HERE *)
 
   (* TEST FOR RANGE *)
-  let obj = jsnew range(0,1,2,3) in
+  (* let obj = jsnew range(0,1,2,3) in *)
 
   (* TEST FOR DELTAS *)
   (* let obj = delta (Js.string "insertText") obj (def (Js.string "pouet")) undefined undefined in *)
   (* let deltas = jsnew array_length(1) in *)
   (* array_set deltas 0 obj; *)
   (* let obj = delta_array deltas (Js.string "doc") in *)
-  let obj = _doc##insert(point 0 4, Js.string "coucou") in
+  (* let obj = _doc##insert(point 0 4, Js.string "coucou") in *)
   
+  (* TEST FOR ANCHOR *)
+  let obj = jsnew anchor(_doc, 0, 3) in
+  (* let obj = obj##getPosition()##column in *)
+
   (* TEST FOR TOKENIZER *)
   (* let state1 = tokenizerState "pouet" *)
   (*   [Str ("keyword.operator"), "let", None] in *)
