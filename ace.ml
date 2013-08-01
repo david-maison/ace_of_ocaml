@@ -9,24 +9,16 @@ type undoOptionsOBJ
 type searchOptions
 type searchOptionsOBJ
 type selectOBJ
-type markerOBJ
-type markerResOBJ
 type cursorOBJ
 type anchorOBJ
 type selectAnchorOBJ
 type selectLeadOBJ
 type typeMarkerOBJ
-type annotOBJ
 type stateUnknownOBJ
-type tokenOBJ
-type tokenarrayOBJ
 type limitOBJ
 type insertResOBJ
 type toPositionOBJ
 type objectEOBJ
-type removeResOBJ
-type replaceResOBJ
-type posResOBJ
 type scrollLeftOBJ
 type scrollTopIBJ
 type replaceOptions
@@ -66,6 +58,7 @@ end
 (* CAN BE IMPROVED *)
 type tokenizerStateItem
 type tokenizerState = string * (tokenizerStateItem js_array t)
+(* WARNING : Need a "start" rule *)
 let tokenizerState nameState tokensItems =
   let state = jsnew array_empty() in
   let _ = List.fold_left (fun i (token, regex, next_opt) ->
@@ -98,7 +91,9 @@ let tokenizerRules tokenizerStates =
 
 class type token = object
   method _type : js_string t readonly_prop
-  method value : js_string t readonly_prop 
+  method value : js_string t readonly_prop
+  method index : int optdef readonly_prop
+  method start : int optdef readonly_prop
 end
 
 class type tokensInfo = object
@@ -106,11 +101,6 @@ class type tokensInfo = object
   method tokens : token t js_array t readonly_prop
 end
 
-class type tokenPos = object
-  inherit token
-  method index : int readonly_prop
-  method start : int readonly_prop
-end
 
 class type tokenizer = object
   (* Signature : line -> state -> tokensInfo
@@ -121,11 +111,11 @@ end
 
 
 class type tokenIterator = object
-  method getCurrentToken : tokenPos t optdef meth
+  method getCurrentToken : token t optdef meth
   method getCurrentTokenColumn : int meth
   method getCurrentTokenRow : int meth
-  method stepBackward : tokenPos t opt meth
-  method stepForward : tokenPos t opt meth
+  method stepBackward : token t opt meth
+  method stepForward : token t opt meth
 end
 
 class type scrollBar = object
@@ -222,6 +212,21 @@ and undoManager = object
 end
 
 
+(* UNSAFE *)
+and matchingBraceOutdent = object
+  (* method autoOutdent : document t -> int -> unit meth *)
+  (* method checkOutdent : js_string t -> js_string t -> bool t meth *)
+end
+(* END UNSAFE *)
+
+(* TO COMPLETE *) and mode = object
+  method autoOutdent : (js_string t -> document t -> int -> unit) prop
+  method checkOutdent : (js_string t -> js_string t -> js_string t -> bool t) prop
+  method getNextLineIndent : (js_string t -> js_string t -> js_string t -> js_string t) prop
+  method toggleCommentLines : (js_string t -> document t -> int -> int -> unit) prop
+end
+
+
 and document = object
   method applyDeltas : delta t js_array t -> unit meth
   method createAnchor : int -> int -> anchor t meth 
@@ -278,20 +283,20 @@ end
   method getNewLineMode : js_string t meth
   method getOverwrite : bool t meth
   method getRowLength : int -> int meth
-  method getRowSplitData : int -> js_string t meth (* A TEST (object row et res ? *)
-  method getScreenLastRowColumn : int -> int meth  (* A TEST : int or pos? *)
+  method getRowSplitData : int -> js_string t js_array t optdef meth (* A TEST *)
+  method getScreenLastRowColumn : int -> int meth
   method getScreenLength : int meth
   method getScreenTabSize : int -> int meth
   method getScreenWidth : int meth
   method getScrollLeft : int meth
   method getScrollTop : int meth
-  method getSelection : js_string t meth
-  method getState : int -> stateUnknownOBJ meth (* A TEST *)
+  method getSelection : js_string t meth (* WARNING res= selection *)
+  method getState : int -> js_string t meth
   method getTabSize : int meth
-  method getTabString : js_string t meth (* A TEST *)
+  method getTabString : js_string t meth
   method getTextRange : range t -> js_string t meth
-  method getTokenAt : int -> int -> tokenOBJ meth (* A TEST *)
-  method getTokens : int -> tokenarrayOBJ meth	  (* A TEST *)
+  method getTokenAt : int -> int -> token t meth
+  method getTokens : int -> token t js_array t meth
   method getUndoManager : undoManager meth
   method getUseSoftTabs : bool t meth
   method getUseWorker : bool t meth
@@ -315,20 +320,20 @@ end
   method outdentRows : range t -> unit meth
   method redo : unit meth (* A TEST (Undocumented) *)
   method redoChanges : delta t js_array t -> bool t -> range t meth (* A TEST *)
-  method remove : range t -> removeResOBJ meth (* A TEST *)
+  method remove : range t -> point t meth
   method removeGutterDecoration : int -> js_string t -> unit meth
   method removeMarker : int -> unit 	(* A TEST : markerId *)
-  method replace : range t -> js_string t -> replaceResOBJ meth (* A TEST *)
+  method replace : range t -> js_string t -> point t meth
   method reset : unit meth (* A TEST (Undocumented) *)
   method resetCaches : unit meth (* A TEST (Undocumented) *)
   method screenToDocumentColumn : unit meth (* A TEST (Undocumented) *)
-  method screenToDocumentPosition : int -> int -> posResOBJ meth (* A TEST *)
+  method screenToDocumentPosition : int -> int -> point t meth
   method screenToDocumentRow : unit meth (* A TEST (Undocumented) *)
-  method setAnnotations : annotOBJ js_array t -> unit meth (* A TEST *)
+  method setAnnotations : annotation t js_array t -> unit meth (* A TEST *)
   method setBreakpoint : int -> js_string t -> unit meth
   method setBreakpoints : int js_array t -> unit meth
   method setDocument : document t -> unit meth
-  method setMode : unit meth (* A TEST (Undocumented) *)
+  method setMode : mode t -> unit meth (* A TEST (Undocumented) *)
   method setNewLineMode : js_string t -> unit meth
   method setOverwrite : bool t -> unit meth
   method setScrollLeft : scrollLeftOBJ -> unit meth (* A TEST *)
@@ -351,7 +356,7 @@ end
 (* A TEST *)class type backgroundTokenizer = object
   method fireUpdateEvent : int -> int -> unit meth
   method getState : int -> stateTokenOBJ meth	(* A TEST Res *)
-  method getTokens : int -> tokenOBJ js_array t meth (* A TEST Res *)
+  method getTokens : int -> token t js_array t meth (* A TEST Res *)
   method on : js_string t -> ('a -> unit) -> unit meth
   method setDocument : document t -> unit meth
   method setTokenizer : tokenizer t -> unit meth
@@ -484,7 +489,7 @@ end
   method scrollToX : int -> int meth    (* A TEST Res = int ? *)
   method scrollToY : int -> int meth    (* A TEST Res = int ? *)
   method setAnimatedScroll : bool t -> unit meth
-  method setAnnontations : annotOBJ js_array t -> unit meth (* A TEST *)
+  method setAnnotations : annotation t js_array t -> unit meth (* A TEST *)
   method setCompositionText : js_string t -> unit meth (* A TEST (Undocumented) *)
   method setDisplayIndentGuides : unit meth (* A TEST (Undocumented) *)
   method setFadeFoldWidgets : unit meth (* A TEST (Undocumented) *)
@@ -679,8 +684,9 @@ end
 let anchor = Unsafe.variable "ace.require(\"./anchor\").Anchor"
 let backgroundTokenizer = Unsafe.variable "ace.require(\"./background_tokenizer\").BackgroundTokenizer"
 (* TO COMPLETE (String|Array) *)let document = Unsafe.variable "ace.require(\"./document\").Document"
-(* TO COMPLETE (TextMode = Mode or String?) *)let editSession= Unsafe.variable "ace.require(\"./edit_session\").EditSession" 
+(* TO COMPLETE (String|Mode) *)let editSession = Unsafe.variable "ace.require(\"./edit_session\").EditSession"
 let editor = Unsafe.variable "ace.require(\"./editor\").Editor"
+let matchingBraceOutdent = Unsafe.variable "ace.require(\"./matching_brace_outdent\").MatchingBraceOutdent"
 let range = Unsafe.variable "ace.require(\"./range\").Range"
 let scrollBar = Unsafe.variable "ace.require(\"./scrollbar\").ScrollBar"
 let search = Unsafe.variable "ace.require(\"./search\").Search"
@@ -693,6 +699,15 @@ let virtualRenderer = Unsafe.variable "ace.require(\"./virtual_renderer\").Virtu
 
 
 (** OTHER CONSTRUCTORS **)
+let mode tokenizer outdent =
+  let _Mode = Unsafe.variable "ace.require(\"./mode/text\").Mode" in
+  ignore (Unsafe.meth_call (fun () -> ()) "call"
+            [| Unsafe.inject (Unsafe.get _Mode "prototype") |]);
+  let mode = jsnew _Mode() in
+  Unsafe.set mode "$tokenizer" tokenizer;
+  Optdef.iter outdent (fun outdent -> Unsafe.set mode "$outdent" outdent);
+  mode
+
 let point row column =
   Unsafe.obj [| "row", Unsafe.inject row ;
 		"column", Unsafe.inject column |]
@@ -744,10 +759,12 @@ let createEditSession text mode =
     Some module's path aren't just uncapitalize moduleName, like
     TokenIterator, the path is" ace/token_iterator"
       -> create enum for moduleName ?
+
+    WARNING 3 require(...) and not ace.require(...) ?
 *)
 let require moduleName =
   let arg = Format.sprintf "require(\"ace/%s\").%s"
     (String.uncapitalize moduleName) moduleName in
   let _module = Unsafe.variable arg in
   Unsafe.set Dom_html.window (Unsafe.variable moduleName) _module
-  
+ 

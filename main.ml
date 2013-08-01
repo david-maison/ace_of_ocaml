@@ -29,7 +29,7 @@ let _ =
   (* let obj = _doc##insert(point 0 4, Js.string "coucou") in *)
   
   (* TEST FOR ANCHOR *)
-  let obj = jsnew anchor(_doc, 0, 3) in
+  (* let obj = jsnew anchor(_doc, 0, 3) in *)
   (* let obj = obj##getPosition()##column in *)
 
   (* TEST FOR TOKENIZER *)
@@ -75,6 +75,22 @@ let _ =
 
   (* TEST FOR UNDOMANAGER *)
   (* let obj = jsnew undoManager() in *)
+
+
+
+  (* TEST NEW EDITOR WITH NEW MODE *)
+(*   let obj = Unsafe.obj "function () { *)
+(*     this.$tokenizer = new Tokenizer(new OcamlHighlightRules().getRules()); *)
+(*     this.$outdent   = new MatchingBraceOutdent(); *)
+(* }" in *)
+  let state1 = tokenizerState "start"
+    [Str "keyword.operator", "let", None] in
+  let rules = tokenizerRules [state1] in
+
+  let obj = mode (jsnew tokenizer(rules, Js.string "")) Js.undefined in
+  editor##getSession()##setMode(obj);
+  obj##getNextLineIndent <- (fun s l t -> Js.string "--");
+  let obj = (obj##getNextLineIndent) (Js.string "") (Js.string "") (Js.string "") in
 
   (* END TEST HERE *)
   setVarTest obj

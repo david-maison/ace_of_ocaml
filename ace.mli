@@ -17,20 +17,12 @@ type cursorOBJ
 type anchorOBJ
 type selectAnchorOBJ
 type selectLeadOBJ
-type markerOBJ
-type markerResOBJ
 type typeMarkerOBJ
-type annotOBJ
 type stateUnknownOBJ
-type tokenOBJ
-type tokenarrayOBJ
 type limitOBJ
 type insertResOBJ
 type toPositionOBJ
 type objectEOBJ
-type removeResOBJ
-type replaceResOBJ
-type posResOBJ
 type scrollLeftOBJ
 type scrollTopIBJ
 type replaceOptions
@@ -44,6 +36,11 @@ type style
 type typeMarker
 val typeMarker_of_string : js_string t -> typeMarker
 val typeMarker_of_function : ('a -> 'b) -> typeMarker
+(* END UNSAFE *)
+
+(* UNSAFE *)
+class type annotation = object
+end
 (* END UNSAFE *)
 
 class type ['a] event = object
@@ -64,11 +61,14 @@ type tokenizerState
 val tokenizerState : string -> (tokenizerToken * string * string option ) list -> tokenizerState
 
 type tokenizerRules
+(* WARNING : Need a "start" rule *)
 val tokenizerRules : tokenizerState list -> tokenizerRules t
 
 class type token = object
   method _type : js_string t readonly_prop
   method value : js_string t readonly_prop 
+  method index : int optdef readonly_prop
+  method start : int optdef readonly_prop
 end
 
 class type tokensInfo = object
@@ -76,23 +76,17 @@ class type tokensInfo = object
   method tokens : token t js_array t readonly_prop
 end
 
-(* Fusionner avec token et mettre des undefined ? *)
-class type tokenPos = object
-  inherit token
-  method index : int readonly_prop
-  method start : int readonly_prop
-end
 
 class type tokenizer = object
   method getLineTokens : js_string t -> js_string t -> tokensInfo t meth
 end
 
 class type tokenIterator = object
-  method getCurrentToken : tokenPos t optdef meth
+  method getCurrentToken : token t optdef meth
   method getCurrentTokenColumn : int meth
   method getCurrentTokenRow : int meth
-  method stepBackward : tokenPos t opt meth
-  method stepForward : tokenPos t opt meth
+  method stepBackward : token t opt meth
+  method stepForward : token t opt meth
 end
 
 
@@ -194,18 +188,12 @@ and matchingBraceOutdent = object
 end
 (* END UNSAFE *)
 
-(* UNSAFE *)
-and mode = object
-  (* method id : js_string t readonly_prop (\* $id ??? *\) *)
-  (* method outdent : matchingBraceOutdent t readonly_prop (\* $outdent ??? *\) *)
-  (* method tokenizer : tokenizer t readonly_prop          (\* $tokenizer ??? *\) *)
-
-  method autoOutdent : js_string t -> document t -> int -> unit meth
-  method checkOutdent : js_string t -> js_string t -> js_string t -> bool t meth
-  method getNextLineIndent : js_string t -> js_string t -> js_string t -> js_string t meth
-  method toggleCommentLines : js_string t -> document t -> int -> int -> unit meth
+(* TO COMPLETE *)and mode = object
+  method autoOutdent : (js_string t -> document t -> int -> unit) prop
+  method checkOutdent : (js_string t -> js_string t -> js_string t -> bool t) prop
+  method getNextLineIndent : (js_string t -> js_string t -> js_string t -> js_string t) prop
+  method toggleCommentLines : (js_string t -> document t -> int -> int -> unit) prop
 end
-(* END UNSAFE *)
 
 and document = object
   method applyDeltas : delta t js_array t -> unit meth
@@ -273,7 +261,7 @@ end
   method getTabSize : int meth
   method getTabString : js_string t meth
   method getTextRange : range t -> js_string t meth
-  method getTokenAt : int -> int -> tokenPos t meth
+  method getTokenAt : int -> int -> token t meth
   method getTokens : int -> token t js_array t meth (* ou tokenPos s'ils ont été vu par le getTokenAt *)
   method getUndoManager : undoManager meth
   method getUseSoftTabs : bool t meth
@@ -298,20 +286,20 @@ end
   method outdentRows : range t -> unit meth
   method redo : unit meth (* A TEST (Undocumented) *)
   method redoChanges : delta t js_array t -> bool t -> range t meth (* A TEST *)
-  method remove : range t -> removeResOBJ meth (* A TEST *)
+  method remove : range t -> point t meth (* A TEST *)
   method removeGutterDecoration : int -> js_string t -> unit meth
   method removeMarker : int -> unit 	(* A TEST : markerId *)
-  method replace : range t -> js_string t -> replaceResOBJ meth (* A TEST *)
+  method replace : range t -> js_string t -> point t meth
   method reset : unit meth (* A TEST (Undocumented) *)
   method resetCaches : unit meth (* A TEST (Undocumented) *)
   method screenToDocumentColumn : unit meth (* A TEST (Undocumented) *)
-  method screenToDocumentPosition : int -> int -> posResOBJ meth (* A TEST *)
+  method screenToDocumentPosition : int -> int -> point t meth
   method screenToDocumentRow : unit meth (* A TEST (Undocumented) *)
-  method setAnnotations : annotOBJ js_array t -> unit meth (* A TEST *)
+  method setAnnotations : annotation t js_array t -> unit meth (* A TEST *)
   method setBreakpoint : int -> js_string t -> unit meth
   method setBreakpoints : int js_array t -> unit meth
   method setDocument : document t -> unit meth
-  method setMode : unit meth (* A TEST (Undocumented) *)
+  method setMode : mode t -> unit meth (* A TEST (Undocumented) *)
   method setNewLineMode : js_string t -> unit meth
   method setOverwrite : bool t -> unit meth
   method setScrollLeft : scrollLeftOBJ -> unit meth (* A TEST *)
@@ -334,7 +322,7 @@ end
 (* A TEST *)class type backgroundTokenizer = object
   method fireUpdateEvent : int -> int -> unit meth
   method getState : int -> stateTokenOBJ meth	(* A TEST Res *)
-  method getTokens : int -> tokenOBJ js_array t meth (* A TEST Res *)
+  method getTokens : int -> token t js_array t meth (* A TEST Res *)
   method on : js_string t -> ('a -> unit) -> unit meth
   method setDocument : document t -> unit meth
   method setTokenizer : tokenizer t -> unit meth
@@ -467,7 +455,7 @@ end
   method scrollToX : int -> int meth    (* A TEST Res = int ? *)
   method scrollToY : int -> int meth    (* A TEST Res = int ? *)
   method setAnimatedScroll : bool t -> unit meth
-  method setAnnontations : annotOBJ js_array t -> unit meth (* A TEST *)
+  method setAnnotations : annotation t js_array t -> unit meth (* A TEST *)
   method setCompositionText : js_string t -> unit meth (* A TEST (Undocumented) *)
   method setDisplayIndentGuides : unit meth (* A TEST (Undocumented) *)
   method setFadeFoldWidgets : unit meth (* A TEST (Undocumented) *)
@@ -655,14 +643,16 @@ end
 end
 
 
-
 (** CONSTRUCTORS **)
 
 val anchor : (document t -> int -> int -> anchor t) constr
 val backgroundTokenizer : (tokenizer t -> editor t -> backgroundTokenizer t) constr
 (* TO COMPLETE (String|Array) *)val document : (js_string t -> document t) constr
-(* TO COMPLETE (TextMode = Mode or String?) *)val editSession : (js_string t -> js_string t -> editSession t) constr
+
+(* TO COMPLETE (String|Mode) ?*)val editSession : (js_string t -> js_string t -> editSession t) constr
+
 val editor : (virtualRenderer t -> editSession t -> editor t) constr
+val matchingBraceOutdent : matchingBraceOutdent t constr
 val range : (int -> int -> int -> int -> range t) constr
 val scrollBar : (#Dom.element t -> scrollBar t) constr
 val search : search t constr
@@ -675,6 +665,7 @@ val virtualRenderer : (#Dom.element t -> js_string t -> virtualRenderer t) const
 
 
 (** OTHER CONSTRUCTORS **)
+val mode : tokenizer t -> matchingBraceOutdent t optdef -> mode t
 val point : int -> int -> point t
 val rangeFromPoints : point t -> point t -> range t
 val undoExecuteOptions : delta_array t -> editSession t -> undoExecuteOptions t
@@ -688,3 +679,4 @@ val delta_array : delta t js_array t -> js_string t -> delta_array t
 (* TO COMPLETE *) val createEditSession : js_string t -> js_string t -> editSession t
 
 (* WARNINGS !!! *)val require : string -> unit
+

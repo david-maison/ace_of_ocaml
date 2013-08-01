@@ -29,6 +29,9 @@
  * ***** END LICENSE BLOCK ***** */
 
 define('ace/mode/ocaml', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text', 'ace/tokenizer', 'ace/mode/ocaml_highlight_rules', 'ace/mode/matching_brace_outdent', 'ace/range'], function(require, exports, module) {
+// console.debug(require);
+// console.debug(exports);
+// console.debug(module);
 
 
 var oop = require("../lib/oop");
@@ -90,7 +93,6 @@ var indenter = /(?:[({[=:]|[-=]>|\b(?:else|try|with))\s*$/;
     };
 
 }).call(Mode.prototype);
-
 exports.Mode = Mode;
 });
 
