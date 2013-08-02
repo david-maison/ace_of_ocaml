@@ -4,16 +4,7 @@ open Js
 (* TODO : Object CommandManager (editor.commands) *)
 
 (* TO BE DELETED *)
-type stateTokenOBJ
-type offsetOBJ
-type coordOBJ
-type undoOptionsOBJ
-type selectAnchorOBJ
-type selectLeadOBJ
-type typeMarkerOBJ
-type stateUnknownOBJ
 type objectEOBJ
-type callbackOBJ
 (* END TO BE DELETED *)
 
 
@@ -31,6 +22,11 @@ end
 (* TODO *)
 class type hashHandler = object end
 
+(* TO COMPLETE AND TEST *)
+class type commandManager = object
+    
+end
+
 class type ['a] event = object
   method data : 'a readonly_prop
 end
@@ -47,6 +43,15 @@ class type point = object
   method column : int readonly_prop
 end
 
+class type screenPoint = object
+  inherit point
+  method side : int readonly_prop
+end
+
+class type screenCoord = object
+  method pageX : int readonly_prop
+  method pageY : int readonly_prop
+end
 
 (* TO COMPLETE *)(* type tokenizerToken = Str of string | Arr of string array *)
 type tokenizerToken = string
@@ -169,9 +174,6 @@ end
 end
 
 and undoManager = object
-  (* method dirtyCounter : int readonly_prop *)
-  (* method doc : editSession t optdef readonly_prop *)
-
   method execute : undoExecuteOptions t -> unit meth
   method hasRedo : bool t meth
   method hasUndo : bool t meth
@@ -224,19 +226,18 @@ and document = object
 end
 
 
-
-(* A TEST *)and selection = object
-  method addRange : range t -> bool t -> unit meth (* A TEST *)
+and selection = object
+  method addRange : range t -> bool t -> unit meth (* UNSAFE can fail *)
   method clearSelection : unit meth
-  method detach : unit meth             (* A TEST (Undocumented) *)
-  method fromOrientedRange : unit meth  (* A TEST (Undocumented) *)
-  method getAllRanges : range t js_array t meth (* A TEST Res *)
-  method getCursor : int meth           (* A TEST Res *)
-  method getLineRange : unit meth       (* A TEST (Undocumented) *)
+  method detach : unit meth
+  method fromOrientedRange : range t -> unit meth
+  method getAllRanges : range t js_array t meth (* UNSAFE can fail *)
+  method getCursor : point t meth
+  method getLineRange : int -> bool t -> range t meth 
   method getRange : range t meth
-  method getSelectionAnchor : selectAnchorOBJ meth (* A TEST *)
-  method getSelectionLead : selectLeadOBJ meth     (* A TEST *)
-  method getWordRange : int -> int -> unit meth    (* A TEST row and column = object ?? res = unit ?? *)
+  method getSelectionAnchor : point t meth
+  method getSelectionLead : point t meth
+  method getWordRange : int -> int -> range t meth
   method isBackwards : bool t meth
   method isEmpty : bool t meth
   method isMultiLine : bool t meth
@@ -251,14 +252,14 @@ end
   method moveCursorLongWordLeft : unit meth
   method moveCursorLongWordRight : unit meth
   method moveCursorRight : unit meth
-  method moveCursorShortWordLeft : unit meth (* A TEST (Undocumented) *)
-  method moveCursorShortWordRight : unit meth (* A TEST (Undocumented) *)
+  method moveCursorShortWordLeft : unit meth
+  method moveCursorShortWordRight : unit meth
   method moveCursorTo : int -> int -> bool t -> unit meth
-  method moveCursorToPosition : point t -> unit meth (* A TEST point_w *)
+  method moveCursorToPosition : point t -> unit meth
   method moveCursorToScreen : int -> int -> bool t -> unit meth
   method moveCursorUp : unit meth
-  method moveCursorWordLeft : unit meth (* A TEST (Undocumented) *)
-  method moveCursorWordRight : unit meth (* A TEST (Undocumented) *)
+  method moveCursorWordLeft : unit meth
+  method moveCursorWordRight : unit meth
   method on : js_string t -> ('a -> unit) -> unit meth
   method rectangularRangeBlock : point t -> anchor t -> bool t -> range t js_array t meth
   method selectAll : unit meth
@@ -272,7 +273,7 @@ end
   method selectLineStart : unit meth
   method selectRight : unit meth
   method selectTo : int -> int -> unit meth
-  method selectToPosition : point t -> unit meth (* A TEST point_w *)
+  method selectToPosition : point t -> unit meth
   method selectUp : unit meth
   method selectWord : unit meth
   method selectWordLeft : unit meth
@@ -281,12 +282,11 @@ end
   method setSelectionRange : range t -> bool t -> unit
   method shiftSelection : int -> unit meth
   method splitIntoLines : unit meth
-  method substractPoint : range t -> unit meth (* A TEST range or point or pos ? *)
-  method toggleBlockSelection : unit meth      (* A TEST (Undocumented) *)
-  method toOrientedRange : unit meth (* A TEST (Undocumented) *)
-  method toSingleRange : unit meth (* A TEST (Undocumented) *)
+  method substractPoint : point t -> unit meth
+  method toggleBlockSelection : unit meth
+  method toOrientedRange : range t -> range t meth
+  method toSingleRange : range t -> unit meth
 end
-
 
 (* A TEST *) and editSession = object
   method addDynamicMarker : marker t -> bool t -> marker t meth (* MARKER A TEST *)
@@ -413,24 +413,23 @@ class type search = object
 end
 
 
-(* A TEST *)class type virtualRenderer = object
-  method _loadTheme : unit meth  (* A TEST (Undocumented) *)
+class type virtualRenderer = object
   method addGutterDecoration : int -> js_string t -> unit meth (* DEPRECATED *)
   method adjustWrapLimit : unit meth
-  method alignCursor : unit meth  (* A TEST (Undocumented) *)
-  method animateScrolling : unit meth  (* A TEST (Undocumented) *)
+  method alignCursor : point t -> int -> int meth
+  method animateScrolling : int -> (unit -> unit) -> unit meth
   method destroy : unit meth
   method getAnimatedScroll : bool t meth
-  method getContainerElement : Dom.element t meth (* A TEST Dom.element *)
-  method getDisplayIndentGuides : unit meth (* A TEST (Undocumented) *)
-  method getFadeFoldWigdets : unit meth (* A TEST (Undocumented) *)
+  method getContainerElement : #Dom.element t meth
+  method getDisplayIndentGuides : bool t meth
+  method getFadeFoldWigdets : bool t meth
   method getFirstFullyVisibleRow : int meth
   method getFirstVisibleRow : int meth 
-  method getHighlightGutterLine : unit meth (* A TEST (Undocumented) *)
+  method getHighlightGutterLine : bool t meth
   method getHScrollBarAlwaysVisible : bool t meth
   method getLastFullyVisibleRow : int meth
   method getLastVisibleRow : int meth
-  method getMouseEventTarget : Dom.element t meth (* A TEST Dom.element *)
+  method getMouseEventTarget : #Dom.element t meth
   method getPrintMarginColumn : bool t meth
   method getScrollBottomRow : int meth
   method getScrollLeft : int meth
@@ -439,30 +438,30 @@ end
   method getShowGutter : bool t meth
   method getShowInvisibles : bool t meth
   method getShowPrintMargin : bool t meth
-  method getTextAreaContainer : Dom.element t meth (* A TEST Dom.element *)
+  method getTextAreaContainer : #Dom.element t meth
   method getTheme : js_string t meth
   method hideComposition : unit meth
   method hideCursor : unit meth
   method isScrollableBy : int -> int -> bool t meth
-  method onChangeTabSize : unit meth    (* A TEST (Undocumented) *)
-  method onGutterResize : unit meth    (* A TEST (Undocumented) *)
+  method onChangeTabSize : (unit -> unit) prop
+  method onGutterResize : (unit -> unit) prop
   method onResize : bool t -> int -> int -> int -> unit meth
-  method pixelToScreenCoordinates : unit meth    (* A TEST (Undocumented) *)
-  method removeGutterDecoration : int -> js_string t -> unit meth (* DEPRECATED *)
-  method screenToTextCoordinates : unit meth (* A TEST (Undocumented) *)
+  method pixelToScreenCoordinates : int -> int -> screenPoint t meth
+  method removeGutterDecoration : int -> js_string t -> unit meth(* DEPRECATED *)
+  method screenToTextCoordinates : int -> int -> point t meth
   method scrollBy : int -> int -> unit meth
-  method scrollCursorIntoView : point t -> offsetOBJ -> unit meth (* A TEST *)
-  method scrollSelectionIntoView : unit meth (* A TEST (Undocumented) *)
-  method scrollToLine: int -> bool t -> bool t -> callbackOBJ -> unit meth (* A TEST callback *)
+  method scrollCursorIntoView : point t -> int -> unit meth
+  method scrollSelectionIntoView : anchor t -> point t -> int -> unit meth
+  method scrollToLine: int -> bool t -> bool t -> (unit -> unit) -> unit meth
   method scrollToRow : int -> unit meth
-  method scrollToX : int -> int meth    (* A TEST Res = int ? *)
-  method scrollToY : int -> int meth    (* A TEST Res = int ? *)
+  method scrollToX : int -> unit meth
+  method scrollToY : int -> unit meth
   method setAnimatedScroll : bool t -> unit meth
-  method setAnnotations : annotation t js_array t -> unit meth (* A TEST *)
-  method setCompositionText : js_string t -> unit meth (* A TEST (Undocumented) *)
-  method setDisplayIndentGuides : unit meth (* A TEST (Undocumented) *)
-  method setFadeFoldWidgets : unit meth (* A TEST (Undocumented) *)
-  method setHighlightGutterLine : unit meth (* A TEST (Undocumented) *)
+  method setAnnotations : annotation t js_array t -> unit meth (* UNSAFE *)
+  method setCompositionText : js_string t -> unit meth
+  method setDisplayIndentGuides : bool t -> unit meth
+  method setFadeFoldWidgets : bool t -> unit meth
+  method setHighlightGutterLine : bool t -> unit meth
   method setHScrollBarAlwaysVisible : bool t -> unit meth
   method setPadding : int -> unit meth
   method setPrintMarginColumn : bool t -> unit meth
@@ -470,14 +469,14 @@ end
   method setShowGutter : bool t -> unit meth
   method setShowInvisibles : bool t -> unit meth
   method setShowPrintMargin : bool t -> unit meth
-  method setStyle : unit meth (* A TEST (Undocumented) *)
+  method setStyle : js_string t -> bool t -> unit meth
   method setTheme : js_string t -> unit meth
   method showCursor : unit meth
-  method textToScreenCoordinates : int -> int -> coordOBJ meth
+  method textToScreenCoordinates : int -> int -> screenCoord t meth
   method unsetStyle : js_string t -> unit meth
   method updateBackMarkers : unit meth
-  method updateBreakpoints : int -> unit meth (* A TEST rows = obj ? array ? *)
-  method updateCharacterSize : unit meth      (* A TEST (Undocumented) *)
+  method updateBreakpoints : int -> unit meth
+  method updateCharacterSize : unit meth
   method updateCursor : unit meth
   method updateFontSize : unit meth
   method updateFrontMarkers : unit meth
@@ -607,7 +606,7 @@ end
   method revealRange : range t -> bool t -> unit meth
   method scrollPageDown : unit meth
   method scrollPageUp : unit meth
-  method scrollToLine : int -> bool t -> bool t -> callbackOBJ -> unit meth (* A TEST (callback !) *)
+  method scrollToLine : int -> bool t -> bool t -> (unit -> unit) -> unit meth
   method scrollToRow : int -> unit meth
   method selectAll : unit meth
   method selectMore : int -> bool t -> unit meth
