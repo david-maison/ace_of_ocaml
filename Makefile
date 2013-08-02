@@ -11,7 +11,8 @@ all:
 	$(CAMLJS) -c utils.ml
 	$(CAMLJS) -c ace.mli
 	$(CAMLJS) -c ace.ml
-	$(CAMLJS) -o main.byte utils.cmo ace.cmo main.ml
+	$(CAMLJS) -c example.ml
+	$(CAMLJS) -o main.byte utils.cmo ace.cmo example.cmo main.ml
 	js_of_ocaml main.byte
 
 clean:

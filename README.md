@@ -5,8 +5,6 @@ Bindings in js_of_ocaml for Ace Editor
 
 ## IN DEVEL ##
 
-
-
 ~~~ Files ~~~
 
 - ace.ml     : sources of bindings
@@ -15,3 +13,4 @@ Bindings in js_of_ocaml for Ace Editor
 - main.ml    : for tests
 - Makefile   : build "ace.cmo" and tests
 - ace-src/   : Ace Editor's sources
+- example.ml : simple examples

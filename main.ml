@@ -79,21 +79,21 @@ let _ =
 
 
   (* TEST NEW EDITOR WITH NEW MODE *)
-(*   let obj = Unsafe.obj "function () { *)
-(*     this.$tokenizer = new Tokenizer(new OcamlHighlightRules().getRules()); *)
-(*     this.$outdent   = new MatchingBraceOutdent(); *)
-(* }" in *)
-  let state1 = tokenizerState "start"
-    [Str "keyword.operator", "let", None] in
-  let rules = tokenizerRules [state1] in
+  (* let state1 = tokenizerState "start" *)
+  (*   [Str "keyword.operator", "let", None] in *)
+  (* let rules = tokenizerRules [state1] in *)
 
-  let obj = mode (jsnew tokenizer(rules, Js.string "")) Js.undefined in
-  editor##getSession()##setMode(obj);
-  obj##getNextLineIndent <- (fun s l t -> Js.string "--");
-  let obj = (obj##getNextLineIndent) (Js.string "") (Js.string "") (Js.string "") in
+  (* let obj = mode (jsnew tokenizer(rules, Js.string "")) Js.undefined in *)
+  (* editor##getSession()##setMode(obj); *)
+  (* obj##getNextLineIndent <- (fun s l t -> Js.string "--"); *)
+  (* let obj = (obj##getNextLineIndent) (Js.string "") (Js.string "") (Js.string "") in *)
+
 
   (* END TEST HERE *)
-  setVarTest obj
+  setVarTest obj;
+
+  Example.create_editor ();
+  Example.create_editor_with_new_mode ()
 
   
 
