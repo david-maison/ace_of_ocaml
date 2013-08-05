@@ -26,10 +26,19 @@ let create_editor_with_new_mode () =
   let editor = Ace.edit div in
   
   (* Définition des règles du parser *)
-  let keywords = [ "let" ; "in" ; "begin" ; "end" ] in
-  let keywords_regex = jsnew Js.regExp(Js.string (String.concat "|" keywords)) in
+  let keywords = [ "let" ; "in" ; "for" ; "fun" ; "begin" ; "end" ] in
+  let builtinConstants = [ "true" ; "false" ] in
+  let builtinFunctions = [ "print_endline" ; "assert" ; "char_of_int" ] in
+  let keywordsMapper value =
+    if List.mem value keywords then Ace.Keyword
+    else if List.mem value builtinConstants then Ace.Constant_language
+    else if List.mem value builtinFunctions then Ace.Support_function
+    else if value = "this" then Ace.Variable_language
+    else Ace.Identifier
+  in
+  let keywords_regex = jsnew Js.regExp(Js.string "[a-zA-Z_$][a-zA-Z0-9_$]*") in
   let state_start = Ace.tokenizerState "start"
-    [ "keyword.operator", keywords_regex, None ]
+    [ Ace.Fun keywordsMapper, keywords_regex, None ]
   in
   let rules = Ace.tokenizerRules [ state_start ] in
   (* Création du tokenizer contenant les règles *)

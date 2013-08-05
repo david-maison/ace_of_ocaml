@@ -53,13 +53,25 @@ class type screenCoord = object
   method pageY : int readonly_prop
 end
 
-(* TO COMPLETE *)(* type tokenizerToken = Str of string | Arr of string array *)
-type tokenizerToken = string
+(* TO COMPLETE *)
+type tokenizerToken =
+    Comment | Comment_doc | Comment_doc_tag | Constant_language
+  | Constant_language_boolean | Constant_language_delimiter
+  | Constant_language_escape | Constant_numeric | Constant_other
+  | Constant_other_multiline | Empty | Entity_name_function | Identifier
+  | Invalid | Keyword | Keyword_control | Keyword_operator | Paren_lparen 
+  | Paren_rparen | Punctuation_operator | Regexp_keyword_operator
+  | Storage_modifier | Storage_type | String | Support_function | Text
+  | Variable_language | Variable_parameter
+
+type tokenizerTokenTypes =
+    Tok of tokenizerToken | Arr of tokenizerToken array
+  | Fun of (string -> tokenizerToken)
 type tokenizerRegex = Js.regExp Js.t
 
 type tokenizerState
 val tokenizerState : string ->
-  (tokenizerToken * tokenizerRegex * string option ) list -> tokenizerState
+  (tokenizerTokenTypes * tokenizerRegex * string option ) list -> tokenizerState
 
 type tokenizerRules
 (* WARNING : Need a "start" rule *)
