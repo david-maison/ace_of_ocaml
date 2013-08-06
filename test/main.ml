@@ -3,16 +3,14 @@ open Dom_html
 open Ace
 open Js
 
-let debug o = 
-  Firebug.console##debug(o)
+let debug o = Firebug.console##debug(o)
 
-let setVarTest o =
-  Js.Unsafe.set Dom_html.window "oobj" o
+let setVarTest o = Unsafe.set window "oobj" o
 
 let _ =
-  let editor : editor Js.t = Js.Unsafe.get Dom_html.window "editor" in
+  let editor : Editor.editor t = Unsafe.get window "editor" in
   let obj = Js.string "no test running" in
-  let _es = createEditSession (Js.string "let x = 10") (Js.string "ace/mode/ocaml") in
+  let _es = createEditSession (string "let x = 10") (string "ace/mode/ocaml") in
   editor##setSession(_es);
   let _doc = _es##getDocument() in
   require "Range";

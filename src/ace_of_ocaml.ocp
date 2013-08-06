@@ -14,6 +14,26 @@ end
 
 begin library "ace_of_ocaml"
   syntax = "js_of_ocaml.camlp4-syntax"
-  files = [ "utils.ml" "ace.ml" ]
+  files = [ "utils.ml"
+            "coord.ml"
+            "range.ml"
+            "marker.ml"
+            "delta.ml"
+            "tokenizer.ml"
+            "tokenIterator.ml"
+            "undoManager.ml"
+            "document.ml"
+            "event.ml"
+            "anchor.ml"
+            "annotation.ml"
+            "selection.ml"
+            "mode.ml"
+            "backgroundTokenizer.ml"
+            "editSession.ml"
+            "search.ml"
+            "virtualRenderer.ml"
+            "scrollBar.ml"
+            "editor.ml"
+            "ace.ml" ]
   requires = [ "js_of_ocaml" "js_of_ocaml.camlp4-syntax" ]
 end

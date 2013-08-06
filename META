@@ -1,0 +1,4 @@
+version = "0.1-alpha"
+description = "Bindings for Ace's Editor in js_of_ocaml"
+archive(byte) = "js_of_ocaml.cma"
+requires= "js_of_ocaml,js_of_ocaml.syntax"
