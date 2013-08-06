@@ -280,7 +280,7 @@ and document = object
   method getLine : int -> js_string t meth
   method getLines : int -> int -> js_string t js_array t meth
   method getNewLineCharacter : js_string t meth
-  method getNewLineMode : js_string t meth (* Res = enum in safe mode *)
+  method getNewLineMode : js_string t meth
   method getTextRange : range t -> js_string t meth
   method getValue : js_string t meth
   method indexToPosition : int -> int -> point t meth

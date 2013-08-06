@@ -1,6 +1,2 @@
-*.annot
-*.cm[iaot]
-*.cmti
-*~
-main.js
-main.byte
+_obuild/*
+test/main.js

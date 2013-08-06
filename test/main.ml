@@ -3,7 +3,7 @@ open Dom_html
 open Ace
 open Js
 
-let debug o =
+let debug o = 
   Firebug.console##debug(o)
 
 let setVarTest o =
@@ -87,7 +87,6 @@ let _ =
   (* editor##getSession()##setMode(obj); *)
   (* obj##getNextLineIndent <- (fun s l t -> Js.string "--"); *)
   (* let obj = (obj##getNextLineIndent) (Js.string "") (Js.string "") (Js.string "") in *)
-
 
   (* END TEST HERE *)
   setVarTest obj;

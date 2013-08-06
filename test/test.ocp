@@ -1,0 +1,7 @@
+
+begin program "test_ace"
+  has_asm = false
+  syntax = "js_of_ocaml.camlp4-syntax"
+  files = [ "example.ml" "main.ml" ]
+  requires = [ "js_of_ocaml" "ace_of_ocaml" "js_of_ocaml.camlp4-syntax" ]
+end
